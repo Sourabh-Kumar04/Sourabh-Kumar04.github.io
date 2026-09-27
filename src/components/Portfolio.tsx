@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { CommandPalette } from "./CommandPalette";
 import { InteractiveTerminal } from "./InteractiveTerminal";
 import { SpecModal } from "./SpecModal";
 import { TelemetryClock } from "./TelemetryClock";
+import { CyberBackgroundCanvas } from "./CyberBackgroundCanvas";
 import { Toaster } from "./ui/sonner";
 import { audioTelemetry } from "../lib/audio-telemetry";
 import {
@@ -21,6 +22,17 @@ import {
   HardDrive,
   CheckCircle2,
   BookOpen,
+  X,
+  ArrowRight,
+  Menu,
+  Clock,
+  Brain,
+  GraduationCap,
+  FolderGit2,
+  Award,
+  GitPullRequest,
+  HelpCircle,
+  MessageSquare,
 } from "lucide-react";
 
 interface NavLink {
@@ -33,7 +45,7 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   { index: "00", id: "overview", label: "OVERVIEW", meta: "HERO" },
   { index: "01", id: "model-details", label: "MODEL_DETAILS", meta: "PROFILE" },
-  { index: "02", id: "training-data", label: "TRAINING_DATA", meta: "6" },
+  { index: "02", id: "training-data", label: "TRAINING_DATA", meta: "5" },
   { index: "03", id: "evaluation", label: "EVALUATION", meta: "3" },
   { index: "04", id: "learning-repos", label: "LEARNING_REPOS", meta: "7" },
   { index: "05", id: "capabilities", label: "CAPABILITIES", meta: "STACK" },
@@ -285,6 +297,66 @@ const INITIAL_WEIGHTS = [
   0.15, 0.95, 0.5, 0.85, 0.3, 0.95, 0.35, 0.15, 0.65, 0.2, 0.9, 0.4, 0.98,
 ];
 
+function TiltProjectCard({ project }: { project: Project }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState<{ x: number; y: number } | null>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotX = (y - 0.5) * -7;
+    const rotY = (x - 0.5) * 7;
+    setTilt({ x: rotX, y: rotY });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt(null);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: tilt
+          ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) translateZ(8px)`
+          : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)",
+        transition: tilt ? "transform 0.08s ease-out" : "transform 0.4s ease-out",
+        transformStyle: "preserve-3d",
+      }}
+      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform`}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-headline-lg text-white font-bold text-xl">{project.title}</h3>
+        <span
+          className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${project.tagColor}`}
+        >
+          {project.tag}
+        </span>
+      </div>
+      <div className="font-code-mono-sm text-[12px] text-cyan-spec">{project.stack}</div>
+      <p className="font-body-md text-on-surface-variant text-[14px]">{project.description}</p>
+      <div className="flex flex-wrap gap-4 font-mono text-xs pt-1">
+        {project.links.map((link) => (
+          <a
+            key={link.label}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline flex items-center gap-1"
+          >
+            <span>{link.label}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Portfolio() {
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -298,17 +370,10 @@ export function Portfolio() {
   const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
   const [copiedSnippet, setCopiedSnippet] = useState(false);
 
-  // Dynamic telemetry fluctuations
-  const [gpuUtil, setGpuUtil] = useState("88.4%");
-  const [latency, setLatency] = useState("0.42 ms");
-
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
   const [hoveredCell, setHoveredCell] = useState<{ index: number; weight: number } | null>(null);
   const [isRecomputing, setIsRecomputing] = useState(false);
-
-  // Formspree dispatch states
-  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   // Click ripple pings
   const [clickPings, setClickPings] = useState<{ id: number; x: number; y: number }[]>([]);
@@ -360,17 +425,6 @@ export function Portfolio() {
     }, 950);
   };
 
-  // Subtle telemetry jitter every 3.5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const util = (87.5 + Math.random() * 2.2).toFixed(1);
-      const lat = (0.39 + Math.random() * 0.06).toFixed(2);
-      setGpuUtil(`${util}%`);
-      setLatency(`${lat} ms`);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
   // Track active section on scroll
   useEffect(() => {
     const ids = NAV_LINKS.map((link) => link.id);
@@ -408,47 +462,6 @@ export function Portfolio() {
       description: "Forward-pass complete across 8 attention heads.",
     });
     setTimeout(() => setIsRecomputing(false), 450);
-  };
-
-  // Formspree asynchronous dispatch handler
-  const handleFormspreeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFormStatus("sending");
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
-
-    try {
-      const response = await fetch("https://formspree.io/f/mzezgbrg", {
-        method: "POST",
-        body: formData,
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      });
-
-      if (response.ok) {
-        audioTelemetry.playSuccess();
-        setFormStatus("success");
-        form.reset();
-        toast.success("Inference Ping Dispatched!", {
-          description: "Payload delivered securely to Sourabh Kumar.",
-        });
-      } else {
-        setFormStatus("error");
-        toast.error("Dispatch Failed", {
-          description: "Service returned non-200 status. Try alternative channels.",
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      setFormStatus("error");
-      toast.error("Network Error", {
-        description: "Request timed out or failed. Check your connection and try again.",
-      });
-    } finally {
-      window.clearTimeout(timeoutId);
-    }
   };
 
   // Copy active code snippet
@@ -514,6 +527,9 @@ export function Portfolio() {
       {/* CURRICULUM VITAE SPEC MODAL */}
       <SpecModal open={specModalOpen} onClose={() => setSpecModalOpen(false)} />
 
+      {/* 3D WEBGL CYBERNETIC BACKGROUND SCENE */}
+      <CyberBackgroundCanvas />
+
       {/* CRT SCANLINES & HIGH-FREQUENCY LATTICE OVERLAYS */}
       {scanlinesEnabled && (
         <div className="fixed inset-0 scanlines opacity-30 pointer-events-none z-10" />
@@ -558,11 +574,11 @@ export function Portfolio() {
               </span>
               <button
                 type="button"
-                className="lg:hidden text-on-surface-variant hover:text-white"
+                className="lg:hidden text-on-surface-variant hover:text-white cursor-pointer"
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close navigation"
               >
-                <span className="material-symbols-outlined text-[16px]">close</span>
+                <X size={16} />
               </button>
             </div>
           </div>
@@ -592,7 +608,7 @@ export function Portfolio() {
                     <span>{label}</span>
                   </div>
                   {isActive ? (
-                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    <ArrowRight size={14} className="text-primary" />
                   ) : (
                     <span className="text-[10px] opacity-40">{meta}</span>
                   )}
@@ -637,31 +653,29 @@ export function Portfolio() {
         <div className="mx-3 p-3 rounded-[3px] bg-[#0d1219]/90 border border-[#222c3d] flex flex-col gap-2.5">
           <div className="flex items-center justify-between border-b border-[#1b2433] pb-1.5">
             <span className="font-label-telemetry text-[10px] text-on-surface-variant uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
-              QUANTUM FABRIC
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              SYSTEM TELEMETRY
             </span>
             <span className="font-code-mono-sm text-[10px] text-tertiary font-bold tracking-wider">
-              SYNCHRONIZED
+              VERIFIED
             </span>
           </div>
-          <div className="font-code-mono-sm text-[11px] text-on-surface-variant flex flex-col gap-1">
+          <div className="font-code-mono-sm text-[11px] text-on-surface-variant flex flex-col gap-1.5">
             <div className="flex justify-between">
-              <span>SXM6 H200 UTIL</span>
-              <span className="text-primary font-semibold">{gpuUtil} [141GB]</span>
+              <span>PUBLIC REPOS</span>
+              <span className="text-primary font-semibold">62 PUBLIC</span>
             </div>
-            <div className="w-full bg-[#17202c] h-1.5 rounded-[1px] overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-primary to-tertiary h-full transition-all duration-700"
-                style={{ width: gpuUtil }}
-              />
+            <div className="flex justify-between">
+              <span>CERTIFICATIONS</span>
+              <span className="text-cyan-spec font-medium">5 SPECIALIZATIONS</span>
             </div>
-            <div className="flex justify-between pt-1 text-[10px]">
-              <span>MESH LATENCY</span>
-              <span className="text-cyan-spec font-medium">{latency} (P99)</span>
+            <div className="flex justify-between text-[10px]">
+              <span>UPSTREAM PR</span>
+              <span className="text-tertiary font-bold">SwarmLLM #48</span>
             </div>
             <div className="flex justify-between text-[10px]">
               <span>NODE STATUS</span>
-              <span className="text-tertiary font-bold">SK-04 // ACTIVE</span>
+              <span className="text-primary font-bold">SK-04 // ACTIVE</span>
             </div>
           </div>
         </div>
@@ -675,11 +689,11 @@ export function Portfolio() {
             {/* Mobile Menu Button */}
             <button
               type="button"
-              className="lg:hidden text-primary hover:text-white p-1"
+              className="lg:hidden text-primary hover:text-white p-1 cursor-pointer"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open navigation menu"
             >
-              <span className="material-symbols-outlined text-[20px]">menu</span>
+              <Menu size={20} />
             </button>
 
             <div className="flex items-center gap-2 bg-[#121822] px-2.5 lg:px-3 py-1 rounded-[2px] border border-[#232e40]">
@@ -711,7 +725,7 @@ export function Portfolio() {
               className="hidden md:inline-flex items-center gap-1.5 bg-[#121822] hover:bg-[#192230] text-on-surface-variant hover:text-primary px-2.5 py-1 rounded-[2px] border border-[#232e40] transition-colors text-[10px] cursor-pointer"
               title="Open Terminal Palette (Cmd+K)"
             >
-              <span className="material-symbols-outlined text-[13px]">terminal</span>
+              <TerminalIcon size={12} className="text-primary" />
               <span>CMD</span>
               <kbd className="bg-[#1e2736] px-1 py-0.2 rounded text-[9px] text-primary">⌘K</kbd>
             </button>
@@ -751,7 +765,7 @@ export function Portfolio() {
 
             {/* Precision Clock */}
             <div className="hidden sm:flex items-center gap-2 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] text-primary">
-              <span className="material-symbols-outlined text-[14px]">timer</span>
+              <Clock size={13} className="text-primary" />
               <TelemetryClock className="tracking-widest font-mono text-[11px]" />
             </div>
 
@@ -762,9 +776,7 @@ export function Portfolio() {
                 className="w-8 h-8 rounded-[3px] bg-primary/20 border border-primary/50 flex items-center justify-center hover:bg-primary/30 transition-colors cursor-pointer"
                 title="Open Command Palette (⌘K)"
               >
-                <span className="material-symbols-outlined text-primary text-[18px]">
-                  neurology
-                </span>
+                <Brain size={16} className="text-primary" />
               </button>
             </div>
           </div>
@@ -816,9 +828,7 @@ export function Portfolio() {
                         AI/ML Enthusiast — Applied LLM Engineering
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
-                        <span className="material-symbols-outlined text-[13px] text-primary">
-                          account_balance
-                        </span>
+                        <GraduationCap size={14} className="text-primary shrink-0" />
                         B.Sc. (Hons) Computer Science, University of Delhi (2023–2027)
                       </p>
                     </div>
@@ -998,16 +1008,23 @@ export function Portfolio() {
                     PORTFOLIO SPEC // v2026.09
                   </span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono text-xs">
                   <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
                     <span className="text-[10px] text-on-surface-variant block uppercase">
-                      CERTIFICATION CHECKPOINTS
+                      PUBLIC REPOSITORIES
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-cyan-spec">6</span>
-                      <span className="text-[11px] text-on-surface-variant">
-                        Verified Checkpoints
-                      </span>
+                      <span className="text-2xl font-bold text-primary">62</span>
+                      <span className="text-[11px] text-on-surface-variant">Open-Source Repos</span>
+                    </div>
+                  </div>
+                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
+                    <span className="text-[10px] text-on-surface-variant block uppercase">
+                      CERTIFICATIONS
+                    </span>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-2xl font-bold text-cyan-spec">5</span>
+                      <span className="text-[11px] text-on-surface-variant">Specializations</span>
                     </div>
                   </div>
                   <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
@@ -1023,11 +1040,12 @@ export function Portfolio() {
                   </div>
                   <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
                     <span className="text-[10px] text-on-surface-variant block uppercase">
-                      SCHOLAR RECOGNITION
+                      FEATURED SYSTEMS
                     </span>
-                    <div className="flex items-baseline gap-1 mt-1">
-                      <span className="text-sm sm:text-base font-bold text-primary">
-                        AWS AI/ML &apos;24
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-2xl font-bold text-primary">3</span>
+                      <span className="text-[11px] text-on-surface-variant">
+                        PEFT, RAG &amp; ML
                       </span>
                     </div>
                   </div>
@@ -1145,7 +1163,7 @@ export function Portfolio() {
                       </div>
                       <div className="py-2 flex justify-between items-center">
                         <span className="text-on-surface-variant">VECTOR_STORAGE</span>
-                        <span className="text-white">Qdrant, FAISS</span>
+                        <span className="text-white">Qdrant</span>
                       </div>
                       <div className="py-2 flex justify-between items-center">
                         <span className="text-on-surface-variant">OPEN_SOURCE_PR</span>
@@ -1156,7 +1174,7 @@ export function Portfolio() {
 
                   <div className="p-2.5 rounded-[2px] bg-[#0c121b] border border-[#1e283a] flex items-center justify-between text-[11px] font-code-mono-sm">
                     <span className="text-on-surface-variant">VERIFIED CHECKPOINTS</span>
-                    <span className="text-primary font-bold">6 CERTIFIED CREDENTIALS</span>
+                    <span className="text-primary font-bold">5 CERTIFIED SPECIALIZATIONS</span>
                   </div>
                 </div>
               </div>
@@ -1187,7 +1205,16 @@ export function Portfolio() {
                         B.Sc. (Hons) Computer Science
                       </h3>
                       <span className="font-code-mono-sm text-[12px] text-cyan-spec block">
-                        University of Delhi · Aug 2023 – Aug 2027
+                        University of Delhi (2023–2027)
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 border-b border-[#1c2637] pb-3">
+                      <h4 className="font-headline-sm text-white font-bold text-sm">
+                        AWS AI/ML Scholar &apos;24
+                      </h4>
+                      <span className="font-code-mono-sm text-[12px] text-primary/90 block">
+                        Udacity &amp; Amazon Web Services
                       </span>
                     </div>
 
@@ -1195,8 +1222,8 @@ export function Portfolio() {
                       <h4 className="font-headline-sm text-white font-bold text-sm">
                         AI Programming with Python
                       </h4>
-                      <span className="font-code-mono-sm text-[12px] text-primary/90 block">
-                        Udacity Nanodegree · Jun–Sep 2024
+                      <span className="font-code-mono-sm text-[12px] text-tertiary block">
+                        Udacity Nanodegree Program · 2024
                       </span>
                     </div>
                   </div>
@@ -1205,32 +1232,28 @@ export function Portfolio() {
                 <div className="hud-panel p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-cyan-spec">
                   <div className="flex flex-col gap-3">
                     <span className="font-label-telemetry text-[11px] text-cyan-spec uppercase font-bold tracking-wider">
-                      CERTIFICATION CHECKPOINTS (6)
+                      CERTIFICATIONS (5)
                     </span>
                     <div className="flex flex-col gap-2 font-code-mono-sm text-[12px]">
                       <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
                         <span>AWS ML Fundamentals</span>
-                        <span className="text-tertiary text-[11px]">Jul 2025</span>
+                        <span className="text-tertiary text-[11px]">Udacity · Jul 2025</span>
                       </div>
                       <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
                         <span>AI Agents Fundamentals</span>
-                        <span className="text-tertiary text-[11px]">Feb 2025</span>
+                        <span className="text-tertiary text-[11px]">Hugging Face · Feb 2025</span>
                       </div>
                       <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
                         <span>Gemini API by Google</span>
-                        <span className="text-tertiary text-[11px]">Nov 2024</span>
+                        <span className="text-tertiary text-[11px]">Udacity · Nov 2024</span>
                       </div>
                       <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
-                        <span>Foundation of Generative AI</span>
-                        <span className="text-tertiary text-[11px]">Nov 2024</span>
+                        <span>Foundations of Generative AI</span>
+                        <span className="text-tertiary text-[11px]">Udacity · Nov 2024</span>
                       </div>
                       <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
                         <span>AI Programming with Python</span>
-                        <span className="text-tertiary text-[11px]">Sep 2024</span>
-                      </div>
-                      <div className="p-2.5 bg-[#0b0e14] border border-[#1e2635] rounded flex justify-between items-center">
-                        <span>AWS AI/ML Scholar &apos;24</span>
-                        <span className="text-primary text-[11px]">Udacity &amp; AWS · 2024</span>
+                        <span className="text-tertiary text-[11px]">Udacity · Sep 2024</span>
                       </div>
                     </div>
                   </div>
@@ -1310,36 +1333,7 @@ export function Portfolio() {
               {evaluationTab === "projects" ? (
                 <div className="flex flex-col gap-6">
                   {filteredProjects.map((p) => (
-                    <div
-                      key={p.title}
-                      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${p.borderAccent}`}
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h3 className="font-headline-lg text-white font-bold text-xl">{p.title}</h3>
-                        <span
-                          className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${p.tagColor}`}
-                        >
-                          {p.tag}
-                        </span>
-                      </div>
-                      <div className="font-code-mono-sm text-[12px] text-cyan-spec">{p.stack}</div>
-                      <p className="font-body-md text-on-surface-variant text-[14px]">
-                        {p.description}
-                      </p>
-                      <div className="flex flex-wrap gap-4 font-mono text-xs pt-1">
-                        {p.links.map((link) => (
-                          <a
-                            key={link.label}
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline flex items-center gap-1"
-                          >
-                            <span>{link.label}</span>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
+                    <TiltProjectCard key={p.title} project={p} />
                   ))}
                 </div>
               ) : (
@@ -1496,9 +1490,7 @@ export function Portfolio() {
               </div>
               <div className="hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-2 border-primary">
                 <div className="text-primary font-mono text-sm font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[16px] text-tertiary">
-                    check_circle
-                  </span>
+                  <CheckCircle2 size={16} className="text-tertiary shrink-0" />
                   <span>merged: PR #48 → Nehanth/swarmllm</span>
                 </div>
                 <p className="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
@@ -1514,7 +1506,7 @@ export function Portfolio() {
                     className="text-primary font-mono text-xs hover:underline inline-flex items-center gap-1.5"
                   >
                     <span>view commit ↗</span>
-                    <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                    <ExternalLink size={13} className="shrink-0" />
                   </a>
                 </div>
               </div>
@@ -1557,79 +1549,52 @@ export function Portfolio() {
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-7 hud-panel p-6 rounded-[3px] flex flex-col gap-4">
-                  {formStatus === "success" ? (
-                    <div className="flex flex-col items-center justify-center p-8 text-center gap-3 bg-[#0a0f16] rounded border border-tertiary/40">
-                      <span className="material-symbols-outlined text-tertiary text-[36px]">
-                        task_alt
-                      </span>
-                      <h4 className="text-white font-bold text-base">
-                        INFERENCE PING DISPATCHED // 200 OK
+                  <div className="flex items-center justify-between border-b border-[#1b2331] pb-2">
+                    <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider flex items-center gap-2">
+                      <HelpCircle size={14} className="text-primary" />
+                      COMMON QUERIES // DIRECT CLARITY
+                    </span>
+                    <span className="font-code-mono-sm text-[10px] text-tertiary">
+                      VERIFIED RECIPIENT
+                    </span>
+                  </div>
+
+                  <div className="space-y-4 font-mono text-xs">
+                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
+                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
+                        <span className="text-primary font-bold">Q:</span> What roles are you
+                        currently looking for?
                       </h4>
-                      <p className="text-on-surface-variant font-mono text-xs max-w-sm">
-                        Payload successfully delivered to Sourabh Kumar. Expected response SLA &lt;
-                        24h.
+                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
+                        I am actively seeking AI/ML engineering or applied LLM internships. Open to
+                        remote or New Delhi / NCR on-site opportunities focusing on agentic
+                        workflows, fine-tuning (LoRA/PEFT), or RAG systems.
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => setFormStatus("idle")}
-                        className="mt-2 text-primary font-mono text-xs underline cursor-pointer"
-                      >
-                        [DISPATCH ANOTHER PAYLOAD]
-                      </button>
                     </div>
-                  ) : (
-                    <form
-                      onSubmit={handleFormspreeSubmit}
-                      className="flex flex-col gap-3 font-code-mono-sm text-[12px]"
-                    >
-                      <div className="flex justify-between items-center text-[10px] text-on-surface-variant pb-1">
-                        <span>PAYLOAD CONSOLE</span>
-                        <span className="text-tertiary font-bold">SECURE DISPATCH GATEWAY</span>
-                      </div>
-                      <label htmlFor="contact-email" className="sr-only">
-                        Your email address
-                      </label>
-                      <input
-                        id="contact-email"
-                        name="email"
-                        className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors"
-                        placeholder="your-email@org.domain or recruiter@lab.ai"
-                        required
-                        type="email"
-                        autoComplete="email"
-                        disabled={formStatus === "sending"}
-                      />
-                      <label htmlFor="contact-message" className="sr-only">
-                        Message
-                      </label>
-                      <textarea
-                        id="contact-message"
-                        name="message"
-                        className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] resize-none focus:border-primary focus:outline-none transition-colors"
-                        placeholder="Enter dispatch message payload or inquiry..."
-                        required
-                        rows={4}
-                        disabled={formStatus === "sending"}
-                      />
-                      <button
-                        className="bg-primary hover:bg-white text-black font-bold py-2.5 px-4 rounded-[2px] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
-                        type="submit"
-                        disabled={formStatus === "sending"}
-                      >
-                        {formStatus === "sending" ? (
-                          <>
-                            <span className="w-2 h-2 rounded-full bg-black animate-ping" />
-                            <span>DISPATCHING PAYLOAD...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="material-symbols-outlined text-[15px]">send</span>
-                            <span>DISPATCH INFERENCE PING</span>
-                          </>
-                        )}
-                      </button>
-                    </form>
-                  )}
+
+                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
+                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
+                        <span className="text-cyan-spec font-bold">Q:</span> Where should I start
+                        looking at your work?
+                      </h4>
+                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
+                        Check out <strong className="text-white">RasoSynthTune</strong> for an
+                        end-to-end multi-agent dataset synthesis architecture, or review{" "}
+                        <strong className="text-white">PR #48 on Nehanth/swarmllm</strong> to
+                        inspect merged upstream open-source code.
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
+                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
+                        <span className="text-tertiary font-bold">Q:</span> How can I get in touch?
+                      </h4>
+                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
+                        The best channels are direct messages via LinkedIn or opening an
+                        issue/discussion on GitHub. Both profiles are monitored daily.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="lg:col-span-5 flex flex-col gap-4 font-code-mono-sm text-xs">

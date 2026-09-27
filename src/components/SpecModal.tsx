@@ -78,9 +78,9 @@ EDUCATION:
 - AI Programming with Python Nanodegree, Udacity (Jun – Sep 2024)
 
 CORE CAPABILITIES:
-- Fine-Tuning & PEFT: LoRA, QLoRA, Axolotl, Unsloth, Hugging Face, vLLM
-- Agentic Systems & RAG: LangGraph, LangChain, Multi-Agent State-Machine DAGs, FAISS, Qdrant
-- Distributed & Cloud: SwarmLLM WebGPU, Docker, AWS SageMaker & EC2, FastAPI, PyTorch
+- Fine-Tuning & PEFT: LoRA, QLoRA, Hugging Face PEFT & Transformers
+- Agentic Systems & RAG: LangGraph, LangChain, Multi-Agent State-Machine DAGs, Qdrant
+- Distributed & Systems: SwarmLLM WebGPU (PR #48), Docker, FastAPI, PyTorch
 
 PROJECTS:
 1. RasoSynthTune: Multi-agent autonomous dataset synthesis & LoRA fine-tuning (Mistral, LLaMA-3, Phi-3).
@@ -233,13 +233,13 @@ PROJECTS:
               <div className="p-2.5 bg-[#0d131d] border border-[#1e283a] rounded-[2px]">
                 <p className="text-primary font-bold text-[11px] mb-1">PEFT & LLMs</p>
                 <p className="text-on-surface-variant text-[11px] leading-relaxed">
-                  LoRA, QLoRA, Axolotl, Unsloth, Hugging Face Transformers, vLLM, GQA, RoPE.
+                  LoRA, QLoRA, Hugging Face Transformers, PEFT, GQA, RoPE.
                 </p>
               </div>
               <div className="p-2.5 bg-[#0d131d] border border-[#1e283a] rounded-[2px]">
                 <p className="text-cyan-spec font-bold text-[11px] mb-1">AGENTS & RAG</p>
                 <p className="text-on-surface-variant text-[11px] leading-relaxed">
-                  LangGraph, LangChain, State Machine DAGs, FAISS, Qdrant, BM25 + Cross-Encoder.
+                  LangGraph, LangChain, State Machine DAGs, Qdrant, BM25 + Cross-Encoder.
                 </p>
               </div>
               <div className="p-2.5 bg-[#0d131d] border border-[#1e283a] rounded-[2px]">

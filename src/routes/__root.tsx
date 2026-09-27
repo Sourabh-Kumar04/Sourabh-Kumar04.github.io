@@ -77,19 +77,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SK-04 // SOURABH KUMAR — AUTONOMOUS ML & QUANTUM INFERENCE" },
+      { title: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS" },
       {
         name: "description",
-        content: "SK-04: Autonomous ML, Agentic Systems, RAG & Quantum Inference Telemetry.",
+        content:
+          "Sourabh Kumar: Applied LLM engineering, agentic AI systems, RAG, and open-source contributions.",
       },
       { name: "author", content: "Sourabh Kumar" },
       {
         property: "og:title",
-        content: "SK-04 // SOURABH KUMAR — AUTONOMOUS ML & QUANTUM INFERENCE",
+        content: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS",
       },
       {
         property: "og:description",
-        content: "SPEC-2035: Autonomous ML, Agentic Systems, RAG & Quantum Inference Telemetry.",
+        content:
+          "Sourabh Kumar: Applied LLM engineering, agentic AI systems, RAG, and open-source contributions.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -107,10 +109,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
       },
     ],
   }),

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "SK-04 // SOURABH KUMAR — AUTONOMOUS ML & QUANTUM INFERENCE" },
+      { title: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS" },
       {
         name: "description",
         content:
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "SK-04 // SOURABH KUMAR — AUTONOMOUS ML & QUANTUM INFERENCE",
+        content: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS",
       },
       {
         property: "og:description",

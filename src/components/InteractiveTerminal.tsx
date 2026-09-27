@@ -34,7 +34,7 @@ export function InteractiveTerminal({
       output: (
         <div className="text-on-surface-variant space-y-1">
           <p className="text-primary font-bold">SK-04 KERNEL SHELL v4.1.0-TELEMETRY</p>
-          <p>Autonomous ML & Quantum Inference Node initialized.</p>
+          <p>Applied LLM & AI Systems Node initialized.</p>
           <p>
             Type <span className="text-primary font-semibold">help</span> to view available
             operations, or try <span className="text-cyan-spec font-semibold">eval</span> or{" "}
@@ -163,35 +163,36 @@ export function InteractiveTerminal({
       case "eval":
         outputNode = (
           <div className="space-y-1 font-mono text-xs border border-primary/20 bg-primary/5 p-2.5 rounded-[2px]">
-            <p className="text-primary font-bold">== SOTA BENCHMARK EVALUATION LOG ==</p>
+            <p className="text-primary font-bold">== RASOSYNTH EVALUATION HARNESS ==</p>
             <p className="text-white">
-              Target Model:{" "}
-              <span className="text-cyan-spec">Llama-3-8B-Instruct + LoRA (r=16, alpha=32)</span>
+              Target Models:{" "}
+              <span className="text-cyan-spec">Llama-3-8B / Mistral-7B / Phi-3 via LoRA</span>
             </p>
             <p className="text-on-surface-variant">
-              Pipeline: RasoSynthTune Multi-Agent Filtering & Human-in-the-Loop
+              Pipeline: Multi-Agent Dataset Synthesis & Human-in-the-Loop Validation
             </p>
             <div className="grid grid-cols-2 gap-2 my-1 text-[11px]">
               <div className="bg-[#121822] p-1.5 border border-[#232e40]">
-                <span className="text-on-surface-variant">GSM8K Accuracy:</span>{" "}
-                <span className="text-tertiary font-bold">81.4%</span>{" "}
-                <span className="text-primary">(+13.2% vs zero-shot)</span>
+                <span className="text-on-surface-variant">Adaptation:</span>{" "}
+                <span className="text-tertiary font-bold">PEFT / QLoRA</span>{" "}
+                <span className="text-primary">(NF4 double-quant)</span>
               </div>
               <div className="bg-[#121822] p-1.5 border border-[#232e40]">
-                <span className="text-on-surface-variant">Perplexity (PPL):</span>{" "}
-                <span className="text-tertiary font-bold">4.12</span>
+                <span className="text-on-surface-variant">Gating:</span>{" "}
+                <span className="text-tertiary font-bold">Human Review</span>
               </div>
               <div className="bg-[#121822] p-1.5 border border-[#232e40]">
-                <span className="text-on-surface-variant">Inference Latency:</span>{" "}
-                <span className="text-cyan-spec font-bold">14.8 ms/token</span>
+                <span className="text-on-surface-variant">Vector Store:</span>{" "}
+                <span className="text-cyan-spec font-bold">Qdrant</span>
               </div>
               <div className="bg-[#121822] p-1.5 border border-[#232e40]">
                 <span className="text-on-surface-variant">Trainable Parameters:</span>{" "}
-                <span className="text-primary font-bold">0.18% (13.6M / 8.03B)</span>
+                <span className="text-primary font-bold">&lt; 0.6%</span>
               </div>
             </div>
             <p className="text-tertiary flex items-center gap-1">
-              <Sparkles size={12} /> Status: CONVERGED · Loss 0.428 after 3 Epochs
+              <Sparkles size={12} /> Status: Prototype under active development (Hackathon genesis →
+              iterative refinement)
             </p>
           </div>
         );
@@ -228,12 +229,12 @@ export function InteractiveTerminal({
           <div className="space-y-1 font-mono text-xs text-on-surface-variant">
             <p className="text-white font-bold">SOURABH KUMAR — CORE CAPABILITY REGISTRY:</p>
             <p>
-              <span className="text-primary font-semibold">[LLM / PEFT]:</span> LoRA, QLoRA,
-              Axolotl, Unsloth, Hugging Face Transformers, vLLM
+              <span className="text-primary font-semibold">[LLM / PEFT]:</span> LoRA, QLoRA, Hugging
+              Face Transformers, Parameter-Efficient Fine-Tuning
             </p>
             <p>
               <span className="text-cyan-spec font-semibold">[AGENTS & RAG]:</span> LangGraph,
-              LangChain, Multi-Agent State-Machine DAGs, FAISS, Qdrant
+              LangChain, Multi-Agent State-Machine DAGs, Qdrant
             </p>
             <p>
               <span className="text-tertiary font-semibold">[ENGINEERING]:</span> Python, PyTorch,
@@ -241,7 +242,7 @@ export function InteractiveTerminal({
             </p>
             <p>
               <span className="text-secondary font-semibold">[DISTRIBUTED]:</span> SwarmLLM WebGPU
-              distributed inference, AWS SageMaker & EC2
+              distributed inference (PR #48), AWS ML
             </p>
           </div>
         );

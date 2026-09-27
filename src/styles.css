@@ -60,22 +60,6 @@
   --radius: 0.25rem;
 }
 
-.material-symbols-outlined {
-  font-family: "Material Symbols Outlined";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-feature-settings: "liga";
-  -webkit-font-smoothing: antialiased;
-}
-
 .scanlines {
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.32) 50%);
   background-size: 100% 3px;
@@ -84,11 +68,15 @@
 
 .hud-panel {
   position: relative;
-  background: rgba(12, 15, 20, 0.85);
+  background: rgba(12, 15, 20, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(42, 53, 70, 0.7);
-  box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 16px 32px -4px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease;
@@ -97,8 +85,11 @@
 .hud-panel:hover {
   border-color: rgba(236, 194, 70, 0.4);
   box-shadow:
-    0 0 40px rgba(0, 0, 0, 0.95),
-    0 0 15px rgba(236, 194, 70, 0.05);
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.6),
+    0 24px 48px -6px rgba(0, 0, 0, 0.85),
+    0 0 15px rgba(236, 194, 70, 0.08),
+    inset 0 1px 0 rgba(236, 194, 70, 0.2);
 }
 
 .hud-panel::before {
