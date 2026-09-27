@@ -800,23 +800,23 @@ export function Portfolio() {
                 <div className="scan-beam" />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
                   <div className="lg:col-span-8 flex flex-col gap-6">
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-code-mono-sm text-[9.5px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-[2px] uppercase font-bold tracking-wider">
+                        <span className="font-code-mono-sm text-[9px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-[2px] uppercase font-bold tracking-wider">
                           AWS AI/ML SCHOLAR '24 | CS STUDENT @ UNIVERSITY OF DELHI
                         </span>
-                        <span className="font-code-mono-sm text-[9px] text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-[2px] bg-tertiary/5 font-semibold">
+                        <span className="font-code-mono-sm text-[8.5px] text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-[2px] bg-tertiary/5 font-semibold">
                           OPEN TO AI/ML INTERNSHIPS
                         </span>
                       </div>
-                      <h1 className="font-display-hero text-xl sm:text-2xl font-bold text-white tracking-tight pt-0.5">
+                      <h1 className="font-display-hero text-base sm:text-lg lg:text-[19px] font-bold text-white tracking-tight pt-0.5">
                         Sourabh Kumar
                       </h1>
-                      <p className="font-headline-md text-xs sm:text-[13.5px] text-primary font-medium tracking-wide">
+                      <p className="font-headline-md text-xs sm:text-[13px] text-primary font-medium tracking-wide">
                         AI/ML Enthusiast — Applied LLM Engineering
                       </p>
-                      <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[12px]">
-                        <span className="material-symbols-outlined text-[14px] text-primary">
+                      <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
+                        <span className="material-symbols-outlined text-[13px] text-primary">
                           account_balance
                         </span>
                         B.Sc. (Hons) Computer Science, University of Delhi (2023–2027)
