@@ -68,7 +68,8 @@ export function SpecModal({ open, onClose }: SpecModalProps) {
 
   const handleCopySpec = async () => {
     audioTelemetry.playClick();
-    const specText = `SOURABH KUMAR — AI/ML ENGINEER SPEC
+    const specText = `SOURABH KUMAR — APPLIED LLM ENGINEER SPEC
+Email: sourabhkumar.cs@gmail.com
 Location: New Delhi, India
 GitHub: https://github.com/Sourabh-Kumar04
 LinkedIn: https://linkedin.com/in/sourabh-kumar04
@@ -162,18 +163,24 @@ PROJECTS:
                 SOURABH KUMAR
               </h1>
               <p className="text-primary font-mono text-xs tracking-wider mt-0.5">
-                APPLIED LLM & DISTRIBUTED INFERENCE ENGINEER · SK-04
+                APPLIED LLM ENGINEER · AGENTIC SYSTEMS & PEFT FINE-TUNING
               </p>
               <p className="text-on-surface-variant text-xs mt-1">
                 New Delhi, India · Open to High-Impact ML Internships & Distributed Systems
               </p>
             </div>
-            <div className="font-mono text-xs space-y-1 text-right sm:text-right">
+            <div className="font-mono text-xs space-y-1.5 text-right sm:text-right">
+              <a
+                href="mailto:sourabhkumar.cs@gmail.com"
+                className="flex items-center gap-1.5 text-primary hover:underline justify-end"
+              >
+                <Mail size={12} /> sourabhkumar.cs@gmail.com
+              </a>
               <a
                 href="https://github.com/Sourabh-Kumar04"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-cyan-spec hover:underline"
+                className="flex items-center gap-1.5 text-cyan-spec hover:underline justify-end"
               >
                 <Github size={12} /> github.com/Sourabh-Kumar04
               </a>
@@ -181,7 +188,7 @@ PROJECTS:
                 href="https://linkedin.com/in/sourabh-kumar04"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-tertiary hover:underline"
+                className="flex items-center gap-1.5 text-tertiary hover:underline justify-end"
               >
                 <Linkedin size={12} /> linkedin.com/in/sourabh-kumar04
               </a>

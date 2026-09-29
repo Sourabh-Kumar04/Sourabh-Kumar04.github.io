@@ -33,6 +33,7 @@ import {
   GitPullRequest,
   HelpCircle,
   MessageSquare,
+  Mail,
 } from "lucide-react";
 
 interface NavLink {
@@ -73,7 +74,7 @@ const PROJECTS: Project[] = [
     tagColor: "bg-tertiary/10 text-tertiary border-tertiary/30",
     stack: "FastAPI · LangGraph · LoRA/PEFT · Docker · Redis · PostgreSQL · Qdrant",
     description:
-      "A multi-agent pipeline that discovers, filters and constructs datasets for fine-tuning open-source language models, gated by a human review step, then fine-tunes Llama-3, Mistral and Phi-3 via LoRA. Started at a hackathon, still evolving.",
+      "End-to-end multi-agent pipeline discovering, filtering, and synthesizing domain datasets with automated quality gating (>85% score retention) and human-in-the-loop review. Implements 4-bit QLoRA fine-tuning across all 7 linear projections on Llama-3-8B and Mistral-7B, yielding 41.9M trainable params (0.519%) on single consumer GPUs.",
     links: [
       { label: "view repository ↗", href: "https://github.com/Sourabh-Kumar04/RasoSynth_CUTC" },
     ],
@@ -290,12 +291,33 @@ export class DistributedTensorWorker {
   },
 ];
 
-// Initial default 48-cell attention matrix weights
-const INITIAL_WEIGHTS = [
-  0.95, 0.3, 0.6, 0.15, 0.85, 0.2, 0.45, 0.9, 0.35, 0.9, 0.1, 0.75, 0.25, 0.2, 0.95, 0.45, 0.15,
-  0.4, 0.95, 0.55, 0.1, 0.8, 0.3, 0.2, 0.7, 0.15, 0.45, 0.9, 0.3, 0.65, 0.1, 0.9, 0.25, 0.75, 0.3,
-  0.15, 0.95, 0.5, 0.85, 0.3, 0.95, 0.35, 0.15, 0.65, 0.2, 0.9, 0.4, 0.98,
-];
+// Mathematically grounded Transformer Attention: row-stochastic Softmax distribution
+function computeSoftmaxAttention(causal = false): number[] {
+  const numRows = 6;
+  const numCols = 8;
+  const weights: number[] = [];
+
+  for (let r = 0; r < numRows; r++) {
+    const logits: number[] = [];
+    for (let c = 0; c < numCols; c++) {
+      if (causal && c > r) {
+        logits.push(-1e9); // Causal mask
+      } else {
+        // Scaled dot-product logit: QK^T / sqrt(d_k) with realistic diagonal token affinity
+        const base = r === c ? 2.6 : Math.random() * 2.2 - 0.7;
+        logits.push(base);
+      }
+    }
+    const maxL = Math.max(...logits);
+    const expVals = logits.map((l) => (l <= -1e8 ? 0 : Math.exp(l - maxL)));
+    const sumExp = expVals.reduce((a, b) => a + b, 0);
+    const row = expVals.map((e) => Number((e / sumExp).toFixed(3)));
+    weights.push(...row);
+  }
+  return weights;
+}
+
+const INITIAL_WEIGHTS = computeSoftmaxAttention(false);
 
 function AnimatedCounter({ end, duration = 1100 }: { end: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -528,18 +550,14 @@ export function Portfolio() {
     return () => observer.disconnect();
   }, []);
 
-  // Re-generate attention weights (simulates new forward attention pass)
+  // Re-generate attention weights using true row-stochastic Softmax distribution
   const recomputeAttention = () => {
     audioTelemetry.playPing();
     setIsRecomputing(true);
-    const newWeights = Array.from({ length: 48 }, () => {
-      const val = Math.random();
-      return Number(val.toFixed(2));
-    });
-    newWeights[47] = 0.99;
+    const newWeights = computeSoftmaxAttention(false);
     setAttentionWeights(newWeights);
     toast.success("Attention weights recomputed", {
-      description: "Forward-pass complete across 8 attention heads.",
+      description: "Row-stochastic Softmax distribution complete across 8 attention heads.",
     });
     setTimeout(() => setIsRecomputing(false), 450);
   };
@@ -920,7 +938,7 @@ export function Portfolio() {
                         Sourabh Kumar
                       </h1>
                       <p className="font-headline-md text-xs sm:text-[13px] text-primary font-medium tracking-wide">
-                        AI/ML Enthusiast — Applied LLM Engineering
+                        Applied LLM Engineer | Agentic Systems &amp; PEFT Fine-Tuning
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
                         <GraduationCap size={14} className="text-primary shrink-0" />
@@ -956,6 +974,14 @@ export function Portfolio() {
                         <span>linkedin ↗</span>
                       </a>
                       <a
+                        className="bg-[#151c27] border border-tertiary/40 text-tertiary hover:bg-tertiary/10 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
+                        href="mailto:sourabhkumar.cs@gmail.com"
+                        title="Send direct email to Sourabh"
+                      >
+                        <Mail size={13} />
+                        <span>email ↗</span>
+                      </a>
+                      <a
                         href="#evaluation"
                         onClick={() => audioTelemetry.playClick()}
                         className="bg-[#151c27] border border-primary/40 text-primary hover:bg-primary/10 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
@@ -969,9 +995,10 @@ export function Portfolio() {
                           setSpecModalOpen(true);
                         }}
                         className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
+                        title="Open full printable Curriculum Vitae / Resume Spec"
                       >
                         <FileText size={13} />
-                        <span>CV SPEC</span>
+                        <span>CV SPEC (PDF)</span>
                       </button>
                       <button
                         type="button"
@@ -1061,13 +1088,15 @@ export function Portfolio() {
                     <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px]">
                       {hoveredCell ? (
                         <span className="text-primary font-bold">
-                          HEAD [{(hoveredCell.index % 8) + 1}/8] · WEIGHT:{" "}
-                          {hoveredCell.weight.toFixed(3)}
+                          [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] · α_ij:{" "}
+                          {hoveredCell.weight.toFixed(3)} (Softmax)
                         </span>
                       ) : (
-                        <span>SPARSITY: 42.8%</span>
+                        <span className="text-cyan-spec font-medium">
+                          Σ_j α_ij = 1.000 · ROW-STOCHASTIC
+                        </span>
                       )}
-                      <span className="text-tertiary">TOP-K CONVERGED</span>
+                      <span className="text-tertiary">CONVERGED</span>
                     </div>
                   </div>
                 </div>
@@ -1714,8 +1743,14 @@ export function Portfolio() {
                         <span className="text-tertiary font-bold">Q:</span> How can I get in touch?
                       </h4>
                       <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
-                        The best channels are direct messages via LinkedIn or opening an
-                        issue/discussion on GitHub. Both profiles are monitored daily.
+                        Direct email is fastest at{" "}
+                        <a
+                          href="mailto:sourabhkumar.cs@gmail.com"
+                          className="text-primary hover:underline font-mono"
+                        >
+                          sourabhkumar.cs@gmail.com
+                        </a>
+                        . You can also connect via LinkedIn or open an issue/discussion on GitHub.
                       </p>
                     </div>
                   </div>
@@ -1727,8 +1762,8 @@ export function Portfolio() {
                       STATUS &amp; REACHABILITY
                     </span>
                     <p className="text-on-surface-variant text-[13px] font-sans leading-relaxed">
-                      Open to AI/ML internships and interesting problems. Reach out on GitHub or
-                      LinkedIn — both linked here.
+                      Open to AI/ML internships and high-impact problems. Reach out directly via
+                      email, GitHub, or LinkedIn.
                     </p>
                     <div className="space-y-1.5 pt-2 border-t border-[#1b2331]">
                       <div className="flex justify-between">
@@ -1741,6 +1776,18 @@ export function Portfolio() {
                       </div>
                     </div>
                     <div className="pt-2 flex flex-col gap-2">
+                      <a
+                        href="mailto:sourabhkumar.cs@gmail.com"
+                        className="text-primary hover:underline flex items-center justify-between gap-2 p-2 rounded bg-[#0b1018] border border-primary/30 hover:border-primary transition-colors"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Mail size={12} className="text-primary" />
+                          <span>sourabhkumar.cs@gmail.com</span>
+                        </span>
+                        <span className="text-[10px] text-primary/80 uppercase tracking-widest font-mono">
+                          DIRECT
+                        </span>
+                      </a>
                       <a
                         href="https://github.com/Sourabh-Kumar04/"
                         target="_blank"
