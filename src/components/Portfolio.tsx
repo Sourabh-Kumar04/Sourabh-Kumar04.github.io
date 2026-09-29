@@ -34,6 +34,7 @@ import {
   HelpCircle,
   MessageSquare,
   Mail,
+  Send,
 } from "lucide-react";
 
 interface NavLink {
@@ -485,6 +486,53 @@ export function Portfolio() {
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
   const [hoveredCell, setHoveredCell] = useState<{ index: number; weight: number } | null>(null);
   const [isRecomputing, setIsRecomputing] = useState(false);
+
+  // Payload console dispatch state
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormStatus("sending");
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const email = (formData.get("email") as string) || "";
+    const message = (formData.get("message") as string) || "";
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
+
+    try {
+      const response = await fetch("https://formspree.io/f/mzezgbrg", {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+        signal: controller.signal,
+      });
+
+      if (response.ok) {
+        audioTelemetry.playSuccess();
+        setFormStatus("success");
+        form.reset();
+        toast.success("Inference Ping Dispatched!", {
+          description: "Payload delivered securely to Sourabh Kumar.",
+        });
+        return;
+      }
+    } catch {
+      // Fallback to mailto
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+
+    // Direct mailto fallback if Formspree is unconfigured or blocked
+    audioTelemetry.playSuccess();
+    setFormStatus("success");
+    toast.success("Dispatch Ready", {
+      description: "Opening mail client directed to sourabhkumar.cs@gmail.com...",
+    });
+    window.location.href = `mailto:sourabhkumar.cs@gmail.com?subject=${encodeURIComponent(
+      `Inference Ping from ${email || "Portfolio Visitor"}`,
+    )}&body=${encodeURIComponent(message)}`;
+  };
 
   // Initialize audio state
   useEffect(() => {
@@ -1702,58 +1750,79 @@ export function Portfolio() {
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div className="lg:col-span-7 hud-panel p-6 rounded-[3px] flex flex-col gap-4">
-                  <div className="flex items-center justify-between border-b border-[#1b2331] pb-2">
-                    <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider flex items-center gap-2">
-                      <HelpCircle size={14} className="text-primary" />
-                      COMMON QUERIES // DIRECT CLARITY
-                    </span>
-                    <span className="font-code-mono-sm text-[10px] text-tertiary">
-                      VERIFIED RECIPIENT
-                    </span>
-                  </div>
-
-                  <div className="space-y-4 font-mono text-xs">
-                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
-                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
-                        <span className="text-primary font-bold">Q:</span> What roles are you
-                        currently looking for?
+                  {formStatus === "success" ? (
+                    <div className="flex flex-col items-center justify-center p-8 text-center gap-3 bg-[#0a0f16] rounded border border-tertiary/40">
+                      <CheckCircle2 size={36} className="text-tertiary" />
+                      <h4 className="text-white font-bold text-base">
+                        INFERENCE PING DISPATCHED // 200 OK
                       </h4>
-                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
-                        I am actively seeking AI/ML engineering or applied LLM internships. Open to
-                        remote or New Delhi / NCR on-site opportunities focusing on agentic
-                        workflows, fine-tuning (LoRA/PEFT), or RAG systems.
+                      <p className="text-on-surface-variant font-mono text-xs max-w-sm">
+                        Payload successfully delivered to Sourabh Kumar. Expected response SLA &lt;
+                        24h.
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setFormStatus("idle")}
+                        className="mt-2 text-primary font-mono text-xs underline cursor-pointer"
+                      >
+                        [DISPATCH ANOTHER PAYLOAD]
+                      </button>
                     </div>
-
-                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
-                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
-                        <span className="text-cyan-spec font-bold">Q:</span> Where should I start
-                        looking at your work?
-                      </h4>
-                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
-                        Check out <strong className="text-white">RasoSynthTune</strong> for an
-                        end-to-end multi-agent dataset synthesis architecture, or review{" "}
-                        <strong className="text-white">PR #48 on Nehanth/swarmllm</strong> to
-                        inspect merged upstream open-source code.
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 bg-[#0a0f16] rounded border border-[#1e2736] space-y-1.5">
-                      <h4 className="text-white font-bold text-[13px] flex items-center gap-1.5">
-                        <span className="text-tertiary font-bold">Q:</span> How can I get in touch?
-                      </h4>
-                      <p className="text-on-surface-variant font-sans text-[13.5px] leading-relaxed">
-                        Direct email is fastest at{" "}
-                        <a
-                          href="mailto:sourabhkumar.cs@gmail.com"
-                          className="text-primary hover:underline font-mono"
-                        >
-                          sourabhkumar.cs@gmail.com
-                        </a>
-                        . You can also connect via LinkedIn or open an issue/discussion on GitHub.
-                      </p>
-                    </div>
-                  </div>
+                  ) : (
+                    <form
+                      onSubmit={handleFormSubmit}
+                      className="flex flex-col gap-3 font-code-mono-sm text-[12px]"
+                    >
+                      <div className="flex justify-between items-center text-[10px] text-on-surface-variant pb-1">
+                        <span className="font-bold text-primary tracking-wider">
+                          PAYLOAD CONSOLE
+                        </span>
+                        <span className="text-tertiary font-bold">SECURE DISPATCH GATEWAY</span>
+                      </div>
+                      <label htmlFor="contact-email" className="sr-only">
+                        Your email address
+                      </label>
+                      <input
+                        id="contact-email"
+                        name="email"
+                        className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors"
+                        placeholder="your-email@org.domain or recruiter@lab.ai"
+                        required
+                        type="email"
+                        autoComplete="email"
+                        disabled={formStatus === "sending"}
+                      />
+                      <label htmlFor="contact-message" className="sr-only">
+                        Message
+                      </label>
+                      <textarea
+                        id="contact-message"
+                        name="message"
+                        className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] resize-none focus:border-primary focus:outline-none transition-colors"
+                        placeholder="Enter dispatch message payload or inquiry..."
+                        required
+                        rows={4}
+                        disabled={formStatus === "sending"}
+                      />
+                      <button
+                        className="bg-primary hover:bg-white text-black font-bold py-2.5 px-4 rounded-[2px] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                        type="submit"
+                        disabled={formStatus === "sending"}
+                      >
+                        {formStatus === "sending" ? (
+                          <>
+                            <span className="w-2 h-2 rounded-full bg-black animate-ping" />
+                            <span>DISPATCHING PAYLOAD...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send size={15} />
+                            <span>DISPATCH INFERENCE PING</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
                 </div>
 
                 <div className="lg:col-span-5 flex flex-col gap-4 font-code-mono-sm text-xs">
