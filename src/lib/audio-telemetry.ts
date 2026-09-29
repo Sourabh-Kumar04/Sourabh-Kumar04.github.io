@@ -208,6 +208,42 @@ class AudioTelemetry {
       // Audio context policy
     }
   }
+
+  /** Play a custom synthesizer tone with specified frequency, waveform, and duration */
+  public playTone(freq = 440, type: OscillatorType = "sine", duration = 0.08) {
+    if (!this.enabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = type;
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.035, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.onended = () => {
+        try {
+          osc.disconnect();
+          gain.disconnect();
+        } catch {
+          // ignore disconnect errors
+        }
+      };
+
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch {
+      // Audio context policy
+    }
+  }
 }
 
 export const audioTelemetry = new AudioTelemetry();

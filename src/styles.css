@@ -176,6 +176,68 @@
   }
 }
 
+/* Audio Telemetry Equalizer Bars */
+@keyframes equalizer {
+  0%,
+  100% {
+    height: 3px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.equalizer-bar-1 {
+  animation: equalizer 0.65s ease-in-out infinite;
+}
+.equalizer-bar-2 {
+  animation: equalizer 0.85s ease-in-out 0.15s infinite;
+}
+.equalizer-bar-3 {
+  animation: equalizer 0.55s ease-in-out 0.3s infinite;
+}
+.equalizer-bar-4 {
+  animation: equalizer 0.75s ease-in-out 0.45s infinite;
+}
+
+/* Cybernetic Corner Bracket Accents */
+.hud-corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: rgba(236, 194, 70, 0.35);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+.hud-panel:hover .hud-corner {
+  border-color: rgba(236, 194, 70, 0.85);
+  box-shadow: 0 0 6px rgba(236, 194, 70, 0.5);
+}
+.hud-corner-tl {
+  top: 0;
+  left: 0;
+  border-top: 1.5px solid;
+  border-left: 1.5px solid;
+}
+.hud-corner-tr {
+  top: 0;
+  right: 0;
+  border-top: 1.5px solid;
+  border-right: 1.5px solid;
+}
+.hud-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1.5px solid;
+  border-left: 1.5px solid;
+}
+.hud-corner-br {
+  bottom: 0;
+  right: 0;
+  border-bottom: 1.5px solid;
+  border-right: 1.5px solid;
+}
+
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;

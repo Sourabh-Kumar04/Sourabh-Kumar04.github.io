@@ -297,19 +297,68 @@ const INITIAL_WEIGHTS = [
   0.15, 0.95, 0.5, 0.85, 0.3, 0.95, 0.35, 0.15, 0.65, 0.2, 0.9, 0.4, 0.98,
 ];
 
+function AnimatedCounter({ end, duration = 1100 }: { end: number; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    let startTime: number | null = null;
+    let animId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(ease * end));
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [started, end, duration]);
+
+  return <span ref={ref}>{count}</span>;
+}
+
 function TiltProjectCard({ project }: { project: Project }) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState<{ x: number; y: number } | null>(null);
+  const [tilt, setTilt] = useState<{ x: number; y: number; rawX: number; rawY: number } | null>(
+    null,
+  );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    const rotX = (y - 0.5) * -7;
-    const rotY = (x - 0.5) * 7;
-    setTilt({ x: rotX, y: rotY });
+    const rawX = (e.clientX - rect.left) / rect.width;
+    const rawY = (e.clientY - rect.top) / rect.height;
+    const rotX = (rawY - 0.5) * -7.5;
+    const rotY = (rawX - 0.5) * 7.5;
+    setTilt({ x: rotX, y: rotY, rawX, rawY });
   };
 
   const handleMouseLeave = () => {
@@ -328,9 +377,24 @@ function TiltProjectCard({ project }: { project: Project }) {
         transition: tilt ? "transform 0.08s ease-out" : "transform 0.4s ease-out",
         transformStyle: "preserve-3d",
       }}
-      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform`}
+      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative overflow-hidden`}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <span className="hud-corner hud-corner-tl" />
+      <span className="hud-corner hud-corner-tr" />
+      <span className="hud-corner hud-corner-bl" />
+      <span className="hud-corner hud-corner-br" />
+
+      {/* Dynamic Cursor Spotlight Sheen */}
+      {tilt && (
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[3px] opacity-30 transition-opacity duration-150"
+          style={{
+            background: `radial-gradient(350px circle at ${(tilt.rawX * 100).toFixed(1)}% ${(tilt.rawY * 100).toFixed(1)}%, rgba(236,194,70,0.14), transparent 70%)`,
+          }}
+        />
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
         <h3 className="font-headline-lg text-white font-bold text-xl">{project.title}</h3>
         <span
           className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${project.tagColor}`}
@@ -338,9 +402,13 @@ function TiltProjectCard({ project }: { project: Project }) {
           {project.tag}
         </span>
       </div>
-      <div className="font-code-mono-sm text-[12px] text-cyan-spec">{project.stack}</div>
-      <p className="font-body-md text-on-surface-variant text-[14px]">{project.description}</p>
-      <div className="flex flex-wrap gap-4 font-mono text-xs pt-1">
+      <div className="font-code-mono-sm text-[12px] text-cyan-spec relative z-10">
+        {project.stack}
+      </div>
+      <p className="font-body-md text-on-surface-variant text-[14px] relative z-10">
+        {project.description}
+      </p>
+      <div className="flex flex-wrap gap-4 font-mono text-xs pt-1 relative z-10">
         {project.links.map((link) => (
           <a
             key={link.label}
@@ -369,6 +437,31 @@ export function Portfolio() {
   const [evaluationTab, setEvaluationTab] = useState<"projects" | "code">("projects");
   const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
   const [copiedSnippet, setCopiedSnippet] = useState(false);
+
+  // Scroll depth tracking
+  const [scrollPercent, setScrollPercent] = useState(0);
+
+  // Ambient cursor spotlight tracking
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total > 0) {
+        setScrollPercent(Math.min(100, Math.max(0, (window.scrollY / total) * 100)));
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handlePointerMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handlePointerMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handlePointerMove);
+  }, []);
 
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
@@ -495,6 +588,20 @@ export function Portfolio() {
       className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero"
     >
       <Toaster position="bottom-right" theme="dark" richColors />
+
+      {/* VIEWPORT SCROLL PROGRESS TELEMETRY BAR */}
+      <div
+        className="fixed top-0 left-0 h-[2.5px] z-50 bg-gradient-to-r from-primary via-cyan-spec to-tertiary transition-all duration-75 shadow-[0_0_10px_rgba(236,194,70,0.8)] pointer-events-none"
+        style={{ width: `${scrollPercent}%` }}
+      />
+
+      {/* AMBIENT CURSOR SPOTLIGHT */}
+      <div
+        className="pointer-events-none fixed inset-0 z-10 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(236, 194, 70, 0.045), rgba(0, 229, 255, 0.02) 40%, transparent 75%)`,
+        }}
+      />
 
       {/* INTERACTIVE RADAR PING RIPPLE EFFECT */}
       {clickPings.map((p) => (
@@ -677,6 +784,12 @@ export function Portfolio() {
               <span>NODE STATUS</span>
               <span className="text-primary font-bold">SK-04 // ACTIVE</span>
             </div>
+            <div className="flex justify-between text-[10px] pt-0.5 border-t border-[#1b2433]">
+              <span>SCROLL DEPTH</span>
+              <span className="text-cyan-spec font-mono font-bold">
+                {scrollPercent.toFixed(0).padStart(3, "0")}%
+              </span>
+            </div>
           </div>
         </div>
       </aside>
@@ -736,13 +849,19 @@ export function Portfolio() {
             <button
               type="button"
               onClick={toggleAudio}
-              className="inline-flex items-center gap-1 text-[10px] text-on-surface-variant hover:text-primary transition-colors bg-[#121822] px-2 py-1 rounded-[2px] border border-[#232e40] cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-[10px] text-on-surface-variant hover:text-primary transition-colors bg-[#121822] px-2 py-1 rounded-[2px] border border-[#232e40] cursor-pointer"
               title="Toggle procedural UI audio effects"
             >
               {audioEnabled ? (
                 <>
                   <Volume2 size={12} className="text-tertiary" />
-                  <span className="text-tertiary font-bold hidden sm:inline">AUDIO: FX ON</span>
+                  <span className="text-tertiary font-bold hidden sm:inline">AUDIO: ON</span>
+                  <span className="flex items-center gap-0.5 h-3 ml-0.5" aria-hidden="true">
+                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-1" />
+                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-2" />
+                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-3" />
+                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-4" />
+                  </span>
                 </>
               ) : (
                 <>
@@ -751,6 +870,12 @@ export function Portfolio() {
                 </>
               )}
             </button>
+
+            {/* Scroll Telemetry Depth Gauge */}
+            <div className="hidden lg:flex items-center gap-1.5 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] font-mono text-[10px] text-cyan-spec">
+              <span className="text-on-surface-variant/70 text-[9px]">DEPTH</span>
+              <span className="font-bold">{scrollPercent.toFixed(0).padStart(3, "0")}%</span>
+            </div>
 
             {/* Scanlines Toggle Button */}
             <button
@@ -938,6 +1063,14 @@ export function Portfolio() {
                               setHoveredCell({ index: idx, weight: w });
                             }}
                             onMouseLeave={() => setHoveredCell(null)}
+                            onClick={() => {
+                              audioTelemetry.playTone(380 + (idx % 8) * 45, "sine", 0.08);
+                              setAttentionWeights((prev) => {
+                                const next = [...prev];
+                                next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
+                                return next;
+                              });
+                            }}
                             className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${
                               isRecomputing ? "cell-recomputing" : ""
                             }`}
@@ -1009,41 +1142,57 @@ export function Portfolio() {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono text-xs">
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
+                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+                    <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-br" />
                     <span className="text-[10px] text-on-surface-variant block uppercase">
                       PUBLIC REPOSITORIES
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-primary">62</span>
+                      <span className="text-2xl font-bold text-primary">
+                        <AnimatedCounter end={62} />
+                      </span>
                       <span className="text-[11px] text-on-surface-variant">Open-Source Repos</span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
+                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-cyan-spec/50 transition-colors">
+                    <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-br" />
                     <span className="text-[10px] text-on-surface-variant block uppercase">
                       CERTIFICATIONS
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-cyan-spec">5</span>
+                      <span className="text-2xl font-bold text-cyan-spec">
+                        <AnimatedCounter end={5} />
+                      </span>
                       <span className="text-[11px] text-on-surface-variant">Specializations</span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
+                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-tertiary/50 transition-colors">
+                    <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-br" />
                     <span className="text-[10px] text-on-surface-variant block uppercase">
                       UPSTREAM CONTRIBUTION
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-tertiary">1</span>
+                      <span className="text-2xl font-bold text-tertiary">
+                        <AnimatedCounter end={1} />
+                      </span>
                       <span className="text-[11px] text-on-surface-variant">
                         Merged PR (SwarmLLM)
                       </span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between">
+                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+                    <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-br" />
                     <span className="text-[10px] text-on-surface-variant block uppercase">
                       FEATURED SYSTEMS
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-primary">3</span>
+                      <span className="text-2xl font-bold text-primary">
+                        <AnimatedCounter end={3} />
+                      </span>
                       <span className="text-[11px] text-on-surface-variant">
                         PEFT, RAG &amp; ML
                       </span>
