@@ -203,15 +203,16 @@
 /* Cybernetic Corner Bracket Accents */
 .hud-corner {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-color: rgba(236, 194, 70, 0.35);
   pointer-events: none;
-  transition: all 0.25s ease;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.hud-panel:hover .hud-corner {
-  border-color: rgba(236, 194, 70, 0.85);
-  box-shadow: 0 0 6px rgba(236, 194, 70, 0.5);
+.hud-panel:hover .hud-corner,
+.cyber-card-interactive:hover .hud-corner {
+  border-color: rgba(236, 194, 70, 0.95);
+  box-shadow: 0 0 8px rgba(236, 194, 70, 0.7);
 }
 .hud-corner-tl {
   top: 0;
@@ -219,11 +220,19 @@
   border-top: 1.5px solid;
   border-left: 1.5px solid;
 }
+.hud-panel:hover .hud-corner-tl,
+.cyber-card-interactive:hover .hud-corner-tl {
+  transform: translate(-3px, -3px);
+}
 .hud-corner-tr {
   top: 0;
   right: 0;
   border-top: 1.5px solid;
   border-right: 1.5px solid;
+}
+.hud-panel:hover .hud-corner-tr,
+.cyber-card-interactive:hover .hud-corner-tr {
+  transform: translate(3px, -3px);
 }
 .hud-corner-bl {
   bottom: 0;
@@ -231,11 +240,36 @@
   border-bottom: 1.5px solid;
   border-left: 1.5px solid;
 }
+.hud-panel:hover .hud-corner-bl,
+.cyber-card-interactive:hover .hud-corner-bl {
+  transform: translate(-3px, 3px);
+}
 .hud-corner-br {
   bottom: 0;
   right: 0;
   border-bottom: 1.5px solid;
   border-right: 1.5px solid;
+}
+.hud-panel:hover .hud-corner-br,
+.cyber-card-interactive:hover .hud-corner-br {
+  transform: translate(3px, 3px);
+}
+
+/* Tactile Card Motion & Hover Elevation */
+.cyber-card-interactive {
+  position: relative;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease;
+  will-change: transform, box-shadow;
+}
+.cyber-card-interactive:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 16px 36px -4px rgba(0, 0, 0, 0.75),
+    0 0 20px rgba(236, 194, 70, 0.16);
+  border-color: rgba(236, 194, 70, 0.55);
 }
 
 ::-webkit-scrollbar {

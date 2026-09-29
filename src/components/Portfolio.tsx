@@ -356,8 +356,8 @@ function TiltProjectCard({ project }: { project: Project }) {
     const rect = card.getBoundingClientRect();
     const rawX = (e.clientX - rect.left) / rect.width;
     const rawY = (e.clientY - rect.top) / rect.height;
-    const rotX = (rawY - 0.5) * -7.5;
-    const rotY = (rawX - 0.5) * 7.5;
+    const rotX = (rawY - 0.5) * -8.5;
+    const rotY = (rawX - 0.5) * 8.5;
     setTilt({ x: rotX, y: rotY, rawX, rawY });
   };
 
@@ -372,12 +372,17 @@ function TiltProjectCard({ project }: { project: Project }) {
       onMouseLeave={handleMouseLeave}
       style={{
         transform: tilt
-          ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) translateZ(8px)`
-          : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)",
-        transition: tilt ? "transform 0.08s ease-out" : "transform 0.4s ease-out",
+          ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) translateY(-8px) scale(1.018) translateZ(12px)`
+          : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1) translateZ(0px)",
+        transition: tilt
+          ? "transform 0.08s ease-out, box-shadow 0.15s ease-out"
+          : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease-out",
+        boxShadow: tilt
+          ? "0 22px 45px -8px rgba(0, 0, 0, 0.85), 0 0 25px rgba(236, 194, 70, 0.18)"
+          : undefined,
         transformStyle: "preserve-3d",
       }}
-      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative overflow-hidden`}
+      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative overflow-hidden group cursor-pointer`}
     >
       <span className="hud-corner hud-corner-tl" />
       <span className="hud-corner hud-corner-tr" />
@@ -387,17 +392,19 @@ function TiltProjectCard({ project }: { project: Project }) {
       {/* Dynamic Cursor Spotlight Sheen */}
       {tilt && (
         <div
-          className="pointer-events-none absolute inset-0 rounded-[3px] opacity-30 transition-opacity duration-150"
+          className="pointer-events-none absolute inset-0 rounded-[3px] opacity-40 transition-opacity duration-150"
           style={{
-            background: `radial-gradient(350px circle at ${(tilt.rawX * 100).toFixed(1)}% ${(tilt.rawY * 100).toFixed(1)}%, rgba(236,194,70,0.14), transparent 70%)`,
+            background: `radial-gradient(380px circle at ${(tilt.rawX * 100).toFixed(1)}% ${(tilt.rawY * 100).toFixed(1)}%, rgba(236,194,70,0.18), transparent 70%)`,
           }}
         />
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
-        <h3 className="font-headline-lg text-white font-bold text-xl">{project.title}</h3>
+        <h3 className="font-headline-lg text-white font-bold text-xl group-hover:text-primary transition-colors duration-200">
+          {project.title}
+        </h3>
         <span
-          className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${project.tagColor}`}
+          className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${project.tagColor} transition-transform duration-200 group-hover:scale-105`}
         >
           {project.tag}
         </span>
@@ -405,7 +412,7 @@ function TiltProjectCard({ project }: { project: Project }) {
       <div className="font-code-mono-sm text-[12px] text-cyan-spec relative z-10">
         {project.stack}
       </div>
-      <p className="font-body-md text-on-surface-variant text-[14px] relative z-10">
+      <p className="font-body-md text-on-surface-variant text-[14px] relative z-10 leading-relaxed">
         {project.description}
       </p>
       <div className="flex flex-wrap gap-4 font-mono text-xs pt-1 relative z-10">
@@ -415,7 +422,7 @@ function TiltProjectCard({ project }: { project: Project }) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline flex items-center gap-1"
+            className="text-primary hover:underline flex items-center gap-1.5 transition-transform duration-150 hover:translate-x-1"
           >
             <span>{link.label}</span>
           </a>
@@ -441,9 +448,6 @@ export function Portfolio() {
   // Scroll depth tracking
   const [scrollPercent, setScrollPercent] = useState(0);
 
-  // Ambient cursor spotlight tracking
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-
   useEffect(() => {
     const handleScroll = () => {
       const total = document.documentElement.scrollHeight - window.innerHeight;
@@ -455,21 +459,10 @@ export function Portfolio() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const handlePointerMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", handlePointerMove, { passive: true });
-    return () => window.removeEventListener("mousemove", handlePointerMove);
-  }, []);
-
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
   const [hoveredCell, setHoveredCell] = useState<{ index: number; weight: number } | null>(null);
   const [isRecomputing, setIsRecomputing] = useState(false);
-
-  // Click ripple pings
-  const [clickPings, setClickPings] = useState<{ id: number; x: number; y: number }[]>([]);
 
   // Initialize audio state
   useEffect(() => {
@@ -504,18 +497,12 @@ export function Portfolio() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Global cursor radar ping effect on click
+  // Global click audio
   const handleGlobalClick = (e: React.MouseEvent) => {
-    // Only play root click if the clicked element does not have its own interactive handler
     const isInteractive = (e.target as HTMLElement)?.closest("button, a, input, textarea, select");
     if (!isInteractive) {
       audioTelemetry.playClick();
     }
-    const newPing = { id: Date.now() + Math.random(), x: e.clientX, y: e.clientY };
-    setClickPings((prev) => [...prev.slice(-3), newPing]);
-    setTimeout(() => {
-      setClickPings((prev) => prev.filter((p) => p.id !== newPing.id));
-    }, 950);
   };
 
   // Track active section on scroll
@@ -594,23 +581,6 @@ export function Portfolio() {
         className="fixed top-0 left-0 h-[2.5px] z-50 bg-gradient-to-r from-primary via-cyan-spec to-tertiary transition-all duration-75 shadow-[0_0_10px_rgba(236,194,70,0.8)] pointer-events-none"
         style={{ width: `${scrollPercent}%` }}
       />
-
-      {/* AMBIENT CURSOR SPOTLIGHT */}
-      <div
-        className="pointer-events-none fixed inset-0 z-10 transition-opacity duration-300"
-        style={{
-          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(236, 194, 70, 0.045), rgba(0, 229, 255, 0.02) 40%, transparent 75%)`,
-        }}
-      />
-
-      {/* INTERACTIVE RADAR PING RIPPLE EFFECT */}
-      {clickPings.map((p) => (
-        <div
-          key={p.id}
-          className="fixed pointer-events-none z-50 rounded-full border border-primary/70 w-8 h-8 -ml-4 -mt-4 ping-pulse"
-          style={{ left: `${p.x}px`, top: `${p.y}px` }}
-        />
-      ))}
 
       {/* COMMAND PALETTE MODAL */}
       <CommandPalette
@@ -769,8 +739,8 @@ export function Portfolio() {
           </div>
           <div className="font-code-mono-sm text-[11px] text-on-surface-variant flex flex-col gap-1.5">
             <div className="flex justify-between">
-              <span>PUBLIC REPOS</span>
-              <span className="text-primary font-semibold">62 PUBLIC</span>
+              <span>FEATURED SYSTEMS</span>
+              <span className="text-primary font-semibold">3 ARCHITECTURES</span>
             </div>
             <div className="flex justify-between">
               <span>CERTIFICATIONS</span>
@@ -1141,41 +1111,32 @@ export function Portfolio() {
                     PORTFOLIO SPEC // v2026.09
                   </span>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 font-mono text-xs">
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 font-mono text-xs">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-cyan-spec/60">
                     <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-tr" />
+                    <span className="hud-corner hud-corner-bl" />
                     <span className="hud-corner hud-corner-br" />
-                    <span className="text-[10px] text-on-surface-variant block uppercase">
-                      PUBLIC REPOSITORIES
-                    </span>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-primary">
-                        <AnimatedCounter end={62} />
-                      </span>
-                      <span className="text-[11px] text-on-surface-variant">Open-Source Repos</span>
-                    </div>
-                  </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-cyan-spec/50 transition-colors">
-                    <span className="hud-corner hud-corner-tl" />
-                    <span className="hud-corner hud-corner-br" />
-                    <span className="text-[10px] text-on-surface-variant block uppercase">
+                    <span className="text-[10px] text-on-surface-variant block uppercase tracking-wider">
                       CERTIFICATIONS
                     </span>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-cyan-spec">
+                    <div className="flex items-baseline gap-2 mt-2">
+                      <span className="text-3xl font-bold text-cyan-spec transition-transform duration-200 group-hover:scale-105">
                         <AnimatedCounter end={5} />
                       </span>
                       <span className="text-[11px] text-on-surface-variant">Specializations</span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-tertiary/50 transition-colors">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-tertiary/60">
                     <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-tr" />
+                    <span className="hud-corner hud-corner-bl" />
                     <span className="hud-corner hud-corner-br" />
-                    <span className="text-[10px] text-on-surface-variant block uppercase">
+                    <span className="text-[10px] text-on-surface-variant block uppercase tracking-wider">
                       UPSTREAM CONTRIBUTION
                     </span>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-tertiary">
+                    <div className="flex items-baseline gap-2 mt-2">
+                      <span className="text-3xl font-bold text-tertiary transition-transform duration-200 group-hover:scale-105">
                         <AnimatedCounter end={1} />
                       </span>
                       <span className="text-[11px] text-on-surface-variant">
@@ -1183,14 +1144,16 @@ export function Portfolio() {
                       </span>
                     </div>
                   </div>
-                  <div className="p-3.5 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between relative overflow-hidden group hover:border-primary/50 transition-colors">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-primary/60">
                     <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-tr" />
+                    <span className="hud-corner hud-corner-bl" />
                     <span className="hud-corner hud-corner-br" />
-                    <span className="text-[10px] text-on-surface-variant block uppercase">
+                    <span className="text-[10px] text-on-surface-variant block uppercase tracking-wider">
                       FEATURED SYSTEMS
                     </span>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <span className="text-2xl font-bold text-primary">
+                    <div className="flex items-baseline gap-2 mt-2">
+                      <span className="text-3xl font-bold text-primary transition-transform duration-200 group-hover:scale-105">
                         <AnimatedCounter end={3} />
                       </span>
                       <span className="text-[11px] text-on-surface-variant">
@@ -1343,14 +1306,18 @@ export function Portfolio() {
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="hud-panel p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-primary">
+                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-primary overflow-hidden group cursor-pointer hover:border-primary/80">
+                  <span className="hud-corner hud-corner-tl" />
+                  <span className="hud-corner hud-corner-tr" />
+                  <span className="hud-corner hud-corner-bl" />
+                  <span className="hud-corner hud-corner-br" />
                   <div className="flex flex-col gap-4">
                     <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider">
                       EDUCATION // DEGREE TRACK
                     </span>
 
                     <div className="space-y-1.5 border-b border-[#1c2637] pb-3">
-                      <h3 className="font-headline-sm text-white font-bold text-base">
+                      <h3 className="font-headline-sm text-white font-bold text-base group-hover:text-primary transition-colors">
                         B.Sc. (Hons) Computer Science
                       </h3>
                       <span className="font-code-mono-sm text-[12px] text-cyan-spec block">
@@ -1378,7 +1345,11 @@ export function Portfolio() {
                   </div>
                 </div>
 
-                <div className="hud-panel p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-cyan-spec">
+                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-cyan-spec overflow-hidden group cursor-pointer hover:border-cyan-spec/80">
+                  <span className="hud-corner hud-corner-tl" />
+                  <span className="hud-corner hud-corner-tr" />
+                  <span className="hud-corner hud-corner-bl" />
+                  <span className="hud-corner hud-corner-br" />
                   <div className="flex flex-col gap-3">
                     <span className="font-label-telemetry text-[11px] text-cyan-spec uppercase font-bold tracking-wider">
                       CERTIFICATIONS (5)
@@ -1549,8 +1520,12 @@ export function Portfolio() {
                 {LEARNING_REPOS.map((repo) => (
                   <div
                     key={repo.title}
-                    className="hud-panel p-5 rounded-[3px] flex flex-col justify-between gap-4 border border-[#202c3e] bg-[#090d14]/90 hover:border-primary/50 transition-all"
+                    className="hud-panel cyber-card-interactive p-5 rounded-[3px] flex flex-col justify-between gap-4 border border-[#202c3e] bg-[#090d14]/90 hover:border-cyan-spec/50 overflow-hidden group cursor-pointer"
                   >
+                    <span className="hud-corner hud-corner-tl" />
+                    <span className="hud-corner hud-corner-tr" />
+                    <span className="hud-corner hud-corner-bl" />
+                    <span className="hud-corner hud-corner-br" />
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span
