@@ -69,7 +69,6 @@ export function SpecModal({ open, onClose }: SpecModalProps) {
   const handleCopySpec = async () => {
     audioTelemetry.playClick();
     const specText = `SOURABH KUMAR — APPLIED LLM ENGINEER SPEC
-Email: sourabhkumar.cs@gmail.com
 Location: New Delhi, India
 GitHub: https://github.com/Sourabh-Kumar04
 LinkedIn: https://linkedin.com/in/sourabh-kumar04
@@ -170,12 +169,6 @@ PROJECTS:
               </p>
             </div>
             <div className="font-mono text-xs space-y-1.5 text-right sm:text-right">
-              <a
-                href="mailto:sourabhkumar.cs@gmail.com"
-                className="flex items-center gap-1.5 text-primary hover:underline justify-end"
-              >
-                <Mail size={12} /> sourabhkumar.cs@gmail.com
-              </a>
               <a
                 href="https://github.com/Sourabh-Kumar04"
                 target="_blank"

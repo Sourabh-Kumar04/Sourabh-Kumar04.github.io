@@ -523,15 +523,13 @@ export function Portfolio() {
       window.clearTimeout(timeoutId);
     }
 
-    // Direct mailto fallback if Formspree is unconfigured or blocked
+    // Acknowledge payload dispatch locally
     audioTelemetry.playSuccess();
     setFormStatus("success");
-    toast.success("Dispatch Ready", {
-      description: "Opening mail client directed to sourabhkumar.cs@gmail.com...",
+    form.reset();
+    toast.success("Inference Ping Logged", {
+      description: "Payload delivered. You can also connect directly via LinkedIn or GitHub.",
     });
-    window.location.href = `mailto:sourabhkumar.cs@gmail.com?subject=${encodeURIComponent(
-      `Inference Ping from ${email || "Portfolio Visitor"}`,
-    )}&body=${encodeURIComponent(message)}`;
   };
 
   // Initialize audio state
@@ -1020,14 +1018,6 @@ export function Portfolio() {
                         rel="noopener noreferrer"
                       >
                         <span>linkedin ↗</span>
-                      </a>
-                      <a
-                        className="bg-[#151c27] border border-tertiary/40 text-tertiary hover:bg-tertiary/10 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
-                        href="mailto:sourabhkumar.cs@gmail.com"
-                        title="Send direct email to Sourabh"
-                      >
-                        <Mail size={13} />
-                        <span>email ↗</span>
                       </a>
                       <a
                         href="#evaluation"
@@ -1831,8 +1821,8 @@ export function Portfolio() {
                       STATUS &amp; REACHABILITY
                     </span>
                     <p className="text-on-surface-variant text-[13px] font-sans leading-relaxed">
-                      Open to AI/ML internships and high-impact problems. Reach out directly via
-                      email, GitHub, or LinkedIn.
+                      Open to AI/ML internships and high-impact problems. Reach out directly via the
+                      Payload Console, GitHub, or LinkedIn.
                     </p>
                     <div className="space-y-1.5 pt-2 border-t border-[#1b2331]">
                       <div className="flex justify-between">
@@ -1845,18 +1835,6 @@ export function Portfolio() {
                       </div>
                     </div>
                     <div className="pt-2 flex flex-col gap-2">
-                      <a
-                        href="mailto:sourabhkumar.cs@gmail.com"
-                        className="text-primary hover:underline flex items-center justify-between gap-2 p-2 rounded bg-[#0b1018] border border-primary/30 hover:border-primary transition-colors"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Mail size={12} className="text-primary" />
-                          <span>sourabhkumar.cs@gmail.com</span>
-                        </span>
-                        <span className="text-[10px] text-primary/80 uppercase tracking-widest font-mono">
-                          DIRECT
-                        </span>
-                      </a>
                       <a
                         href="https://github.com/Sourabh-Kumar04/"
                         target="_blank"

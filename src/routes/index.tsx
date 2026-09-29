@@ -6,7 +6,6 @@ const jsonLd = {
   "@type": "Person",
   name: "Sourabh Kumar",
   jobTitle: "AI/ML Engineer",
-  email: "sourabhkumar.cs@gmail.com",
   url: "https://github.com/Sourabh-Kumar04",
   sameAs: ["https://github.com/Sourabh-Kumar04", "https://www.linkedin.com/in/sourabh-kumar04/"],
   alumniOf: {
