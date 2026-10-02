@@ -365,7 +365,11 @@ function AnimatedCounter({ end, duration = 1100 }: { end: number; duration?: num
     return () => cancelAnimationFrame(animId);
   }, [started, end, duration]);
 
-  return <span ref={ref}>{count}</span>;
+  return (
+    <span ref={ref} className="tabular-nums">
+      {count}
+    </span>
+  );
 }
 
 function TiltProjectCard({ project }: { project: Project }) {
@@ -924,6 +928,29 @@ export function Portfolio() {
               <span>CRT: {scanlinesEnabled ? "ON" : "OFF"}</span>
             </button>
 
+            {/* Sticky Recruiter Quick-Actions */}
+            <div className="flex items-center gap-1.5 font-mono">
+              <button
+                type="button"
+                onClick={() => {
+                  audioTelemetry.playClick();
+                  setSpecModalOpen(true);
+                }}
+                className="bg-primary/10 border border-primary/40 text-primary hover:bg-primary hover:text-black px-2.5 py-1 rounded-[2px] text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                title="View printable Curriculum Vitae / Resume"
+              >
+                <FileText size={11} />
+                <span>RESUME</span>
+              </button>
+              <a
+                href="#maintainer"
+                onClick={() => audioTelemetry.playClick()}
+                className="hidden sm:inline-flex bg-cyan-spec/10 border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec hover:text-black px-2 py-1 rounded-[2px] text-[10px] font-bold transition-all items-center gap-1 cursor-pointer"
+              >
+                <span>CONTACT</span>
+              </a>
+            </div>
+
             {/* Precision Clock */}
             <div className="hidden sm:flex items-center gap-2 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] text-primary">
               <Clock size={13} className="text-primary" />
@@ -982,11 +1009,11 @@ export function Portfolio() {
                           OPEN TO AI/ML INTERNSHIPS
                         </span>
                       </div>
-                      <h1 className="font-display-hero text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight pt-1">
+                      <h1 className="font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
                         Sourabh Kumar
                       </h1>
-                      <p className="font-headline-md text-xs sm:text-sm text-primary font-medium tracking-wide">
-                        Applied LLM Engineer | Agentic Systems &amp; PEFT Fine-Tuning
+                      <p className="font-code-mono-sm text-xs sm:text-sm text-primary font-medium tracking-wider uppercase pt-1">
+                        Applied LLM Engineer // Agentic Systems &amp; PEFT Fine-Tuning
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
                         <GraduationCap size={14} className="text-primary shrink-0" />
@@ -1003,10 +1030,22 @@ export function Portfolio() {
                       </p>
                     </div>
 
-                    {/* Action Buttons */}
+                    {/* Action Buttons: Optimized Recruiter Conversion & Provenance Hierarchy */}
                     <div className="flex flex-wrap items-center gap-3 pt-2 font-mono text-xs">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          audioTelemetry.playClick();
+                          setSpecModalOpen(true);
+                        }}
+                        className="bg-primary text-black px-4 py-2 rounded-[2px] font-bold hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_16px_rgba(236,194,70,0.35)]"
+                        title="Open full printable Curriculum Vitae / Resume Spec"
+                      >
+                        <FileText size={13} />
+                        <span>VIEW RESUME / CV SPEC ↗</span>
+                      </button>
                       <a
-                        className="bg-primary text-black px-4 py-2 rounded-[2px] font-bold hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_15px_rgba(236,194,70,0.3)]"
+                        className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                         href="https://github.com/Sourabh-Kumar04"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1014,7 +1053,7 @@ export function Portfolio() {
                         <span>github ↗</span>
                       </a>
                       <a
-                        className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5"
+                        className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                         href="https://linkedin.com/in/sourabh-kumar04"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1024,22 +1063,10 @@ export function Portfolio() {
                       <a
                         href="#evaluation"
                         onClick={() => audioTelemetry.playClick()}
-                        className="bg-[#151c27] border border-primary/40 text-primary hover:bg-primary/10 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
+                        className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                       >
                         <span>view projects ↗</span>
                       </a>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          audioTelemetry.playClick();
-                          setSpecModalOpen(true);
-                        }}
-                        className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
-                        title="Open full printable Curriculum Vitae / Resume Spec"
-                      >
-                        <FileText size={13} />
-                        <span>CV SPEC (PDF)</span>
-                      </button>
                       <button
                         type="button"
                         onClick={() => {
@@ -1160,7 +1187,7 @@ export function Portfolio() {
                         </div>
 
                         {/* Dynamic Readout */}
-                        <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px]">
+                        <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px] tabular-nums">
                           {hoveredCell ? (
                             <span className="text-primary font-bold">
                               [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] ·
@@ -1181,24 +1208,28 @@ export function Portfolio() {
                 {/* Bottom Live Telemetry Strip */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-[#0a0d13]/80 border-t border-[#20293a] mt-6 -mx-4 sm:-mx-6 lg:-mx-8 -mb-4 sm:-mb-6 lg:-mb-8 p-3 sm:p-4 font-code-mono-sm text-[12px]">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant/70 uppercase">STATUS</span>
+                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
+                      STATUS
+                    </span>
                     <span className="text-tertiary font-semibold flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-ping" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
                       OPEN TO INTERNSHIPS
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant/70 uppercase">
+                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
                       PRIMARY STACK
                     </span>
                     <span className="text-white font-semibold">PyTorch • FastAPI</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant/70 uppercase">GEO</span>
+                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
+                      GEO
+                    </span>
                     <span className="text-primary font-semibold">28.61°N, 77.20°E</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant/70 uppercase">
+                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
                       LOCAL TIME
                     </span>
                     <TelemetryClock className="text-cyan-spec font-semibold" />

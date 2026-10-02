@@ -6,8 +6,8 @@ import { audioTelemetry } from "../lib/audio-telemetry";
 export function Interactive3DCore() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rotTextRef = useRef<HTMLSpanElement>(null);
   const [wireframeOnly, setWireframeOnly] = useState(false);
-  const [rotTelemetry, setRotTelemetry] = useState({ x: 0, y: 0 });
   const [isInteracting, setIsInteracting] = useState(false);
 
   // References for mutable animation objects
@@ -24,14 +24,14 @@ export function Interactive3DCore() {
     let width = container.clientWidth || 320;
     const height = 220;
 
-    // 1. Scene & Camera setup
+    // 1. Scene & Camera setup with wider clearance to prevent frustum clipping
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, 0, 4.2);
+    camera.position.set(0, 0, 4.8);
 
-    // 2. WebGL Renderer
+    // 2. WebGL Renderer with ACES Filmic Tone Mapping
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
@@ -40,6 +40,8 @@ export function Interactive3DCore() {
     });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
 
     // 3. 3D Model Hierarchy: Neural Tensor Core
     const coreGroup = new THREE.Group();
@@ -102,17 +104,21 @@ export function Interactive3DCore() {
     coreGroup.add(ringMesh);
     materialsRef.current.push(ringMat);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // Lighting - High-dynamic range chiaroscuro
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
     scene.add(ambientLight);
 
-    const pointLight1 = new THREE.PointLight(0xecc246, 3.5, 10);
+    const pointLight1 = new THREE.PointLight(0xecc246, 3.2, 10);
     pointLight1.position.set(3, 3, 3);
     scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0x15d9c7, 3.0, 10);
+    const pointLight2 = new THREE.PointLight(0x15d9c7, 2.8, 10);
     pointLight2.position.set(-3, -2, 2);
     scene.add(pointLight2);
+
+    const rimLight = new THREE.DirectionalLight(0x15d9c7, 1.2);
+    rimLight.position.set(-4, -3, -2);
+    scene.add(rimLight);
 
     // 4. Interactive Mouse & Drag Physics
     let isDragging = false;
@@ -225,19 +231,21 @@ export function Interactive3DCore() {
       const delta = clock.getDelta();
 
       if (!isDragging) {
-        // Natural rotation and inertia damping
+        // Natural rotation and delta-time normalized inertia damping
         coreGroup.rotation.y += velocity.y;
         coreGroup.rotation.x += velocity.x;
         ringMesh.rotation.z += 0.008;
 
-        // Smoothly settle back toward gentle baseline spin
-        velocity.x *= 0.96;
-        velocity.y = velocity.y * 0.96 + 0.0004;
+        // Continuous exponential decay: frame-rate independent across 60Hz and 144Hz displays
+        const damping = Math.exp(-2.5 * Math.min(delta, 0.1));
+        velocity.x *= damping;
+        velocity.y = velocity.y * damping + 0.0004 * (Math.min(delta, 0.1) / 0.016);
 
-        setRotTelemetry({
-          x: Number((coreGroup.rotation.x % (Math.PI * 2)).toFixed(2)),
-          y: Number((coreGroup.rotation.y % (Math.PI * 2)).toFixed(2)),
-        });
+        if (rotTextRef.current) {
+          const px = (coreGroup.rotation.x % (Math.PI * 2)).toFixed(2);
+          const py = (coreGroup.rotation.y % (Math.PI * 2)).toFixed(2);
+          rotTextRef.current.textContent = `PITCH: ${Number(px) > 0 ? `+${px}` : px} | YAW: ${Number(py) > 0 ? `+${py}` : py}`;
+        }
       }
 
       // Pulse animation dynamics
@@ -335,7 +343,7 @@ export function Interactive3DCore() {
       <div className="relative rounded-[2px] border border-[#1b2331] bg-[#06080c] overflow-hidden group">
         <canvas
           ref={canvasRef}
-          className="w-full h-[210px] cursor-grab active:cursor-grabbing block"
+          className="w-full h-[220px] cursor-grab active:cursor-grabbing block"
           title="Click and drag to orbit 3D Neural Core"
         />
 
@@ -345,9 +353,8 @@ export function Interactive3DCore() {
             <Rotate3d size={10} />
             <span>ORBIT: DRAG_MOUSE</span>
           </span>
-          <span>
-            PITCH: {rotTelemetry.x > 0 ? `+${rotTelemetry.x}` : rotTelemetry.x} | YAW:{" "}
-            {rotTelemetry.y > 0 ? `+${rotTelemetry.y}` : rotTelemetry.y}
+          <span ref={rotTextRef} className="tabular-nums">
+            PITCH: +0.00 | YAW: +0.00
           </span>
         </div>
 

@@ -31,7 +31,7 @@ export const TelemetryClock: React.FC<TelemetryClockProps> = React.memo(
       return () => window.clearInterval(intervalId);
     }, [prefix, showMs]);
 
-    return <span className={className}>{timeStr}</span>;
+    return <span className={`tabular-nums ${className}`}>{timeStr}</span>;
   },
 );
 
