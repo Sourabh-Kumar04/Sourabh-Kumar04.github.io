@@ -5,6 +5,7 @@ import { InteractiveTerminal } from "./InteractiveTerminal";
 import { SpecModal } from "./SpecModal";
 import { TelemetryClock } from "./TelemetryClock";
 import { CyberBackgroundCanvas } from "./CyberBackgroundCanvas";
+import { Interactive3DCore } from "./Interactive3DCore";
 import { Toaster } from "./ui/sonner";
 import { audioTelemetry } from "../lib/audio-telemetry";
 import {
@@ -467,6 +468,7 @@ export function Portfolio() {
   const [evaluationTab, setEvaluationTab] = useState<"projects" | "code">("projects");
   const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
   const [copiedSnippet, setCopiedSnippet] = useState(false);
+  const [heroWidgetTab, setHeroWidgetTab] = useState<"3d-core" | "attention">("3d-core");
 
   // Scroll depth tracking
   const [scrollPercent, setScrollPercent] = useState(0);
@@ -980,10 +982,10 @@ export function Portfolio() {
                           OPEN TO AI/ML INTERNSHIPS
                         </span>
                       </div>
-                      <h1 className="font-display-hero text-base sm:text-lg lg:text-[19px] font-bold text-white tracking-tight pt-0.5">
+                      <h1 className="font-display-hero text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight pt-1">
                         Sourabh Kumar
                       </h1>
-                      <p className="font-headline-md text-xs sm:text-[13px] text-primary font-medium tracking-wide">
+                      <p className="font-headline-md text-xs sm:text-sm text-primary font-medium tracking-wide">
                         Applied LLM Engineer | Agentic Systems &amp; PEFT Fine-Tuning
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
@@ -1052,90 +1054,127 @@ export function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Interactive Attention Weight Density Matrix Panel */}
+                  {/* Interactive 3D Neural Core & Attention Matrix Switcher Panel */}
                   <div className="lg:col-span-4 bg-[#0a0d14]/90 border border-[#222c3d] p-4 rounded-[3px] flex flex-col gap-3">
-                    <div className="flex items-center justify-between border-b border-[#1b2331] pb-2">
-                      <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider">
-                        ATTENTION WEIGHT DENSITY
-                      </span>
-                      <button
-                        type="button"
-                        onClick={recomputeAttention}
-                        disabled={isRecomputing}
-                        className="font-code-mono-sm text-[10px] text-tertiary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                        title="Simulate new attention forward pass"
-                      >
-                        <RefreshCw
-                          size={11}
-                          className={isRecomputing ? "animate-spin text-primary" : ""}
-                        />
-                        <span>{isRecomputing ? "COMPUTING..." : "RE-ATTEND"}</span>
-                      </button>
-                    </div>
+                    <div className="flex items-center justify-between border-b border-[#1b2331] pb-1.5">
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            audioTelemetry.playClick();
+                            setHeroWidgetTab("3d-core");
+                          }}
+                          className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
+                            heroWidgetTab === "3d-core"
+                              ? "bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)]"
+                              : "text-on-surface-variant hover:text-white"
+                          }`}
+                        >
+                          3D TENSOR CORE
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            audioTelemetry.playClick();
+                            setHeroWidgetTab("attention");
+                          }}
+                          className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
+                            heroWidgetTab === "attention"
+                              ? "bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)]"
+                              : "text-on-surface-variant hover:text-white"
+                          }`}
+                        >
+                          ATTENTION MATRIX
+                        </button>
+                      </div>
 
-                    {/* Interactive 48-Cell Grid */}
-                    <div
-                      role="grid"
-                      aria-label="Transformer Attention Weight Matrix (48 simulated heads)"
-                      className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
-                    >
-                      {attentionWeights.map((w, idx) => {
-                        const isHovered = hoveredCell?.index === idx;
-                        const opacity = Math.max(0.12, w);
-                        return (
-                          <div
-                            key={idx}
-                            role="gridcell"
-                            tabIndex={0}
-                            aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
-                            onFocus={() => {
-                              audioTelemetry.playClick();
-                              setHoveredCell({ index: idx, weight: w });
-                            }}
-                            onBlur={() => setHoveredCell(null)}
-                            onMouseEnter={() => {
-                              audioTelemetry.playClick();
-                              setHoveredCell({ index: idx, weight: w });
-                            }}
-                            onMouseLeave={() => setHoveredCell(null)}
-                            onClick={() => {
-                              audioTelemetry.playTone(380 + (idx % 8) * 45, "sine", 0.08);
-                              setAttentionWeights((prev) => {
-                                const next = [...prev];
-                                next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
-                                return next;
-                              });
-                            }}
-                            className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${
-                              isRecomputing ? "cell-recomputing" : ""
-                            }`}
-                            style={{
-                              backgroundColor: idx === 47 ? "var(--tertiary)" : "var(--primary)",
-                              opacity: isHovered ? 1 : opacity,
-                              transform: isHovered ? "scale(1.35)" : "scale(1)",
-                              zIndex: isHovered ? 10 : 1,
-                              boxShadow: isHovered ? "0 0 10px rgba(236,194,70,0.8)" : "none",
-                              animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
-                            }}
+                      {heroWidgetTab === "attention" && (
+                        <button
+                          type="button"
+                          onClick={recomputeAttention}
+                          disabled={isRecomputing}
+                          className="font-code-mono-sm text-[10px] text-tertiary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          title="Simulate new attention forward pass"
+                        >
+                          <RefreshCw
+                            size={11}
+                            className={isRecomputing ? "animate-spin text-primary" : ""}
                           />
-                        );
-                      })}
+                          <span>{isRecomputing ? "..." : "RE-ATTEND"}</span>
+                        </button>
+                      )}
                     </div>
 
-                    {/* Dynamic Readout */}
-                    <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px]">
-                      {hoveredCell ? (
-                        <span className="text-primary font-bold">
-                          [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] · α_ij:{" "}
-                          {hoveredCell.weight.toFixed(3)} (Softmax)
-                        </span>
-                      ) : (
-                        <span className="text-cyan-spec font-medium">
-                          Σ_j α_ij = 1.000 · ROW-STOCHASTIC
-                        </span>
-                      )}
-                      <span className="text-tertiary">CONVERGED</span>
-                    </div>
+                    {heroWidgetTab === "3d-core" ? (
+                      <Interactive3DCore />
+                    ) : (
+                      <>
+                        {/* Interactive 48-Cell Grid */}
+                        <div
+                          role="grid"
+                          aria-label="Transformer Attention Weight Matrix (48 simulated heads)"
+                          className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
+                        >
+                          {attentionWeights.map((w, idx) => {
+                            const isHovered = hoveredCell?.index === idx;
+                            const opacity = Math.max(0.12, w);
+                            return (
+                              <div
+                                key={idx}
+                                role="gridcell"
+                                tabIndex={0}
+                                aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
+                                onFocus={() => {
+                                  audioTelemetry.playClick();
+                                  setHoveredCell({ index: idx, weight: w });
+                                }}
+                                onBlur={() => setHoveredCell(null)}
+                                onMouseEnter={() => {
+                                  audioTelemetry.playClick();
+                                  setHoveredCell({ index: idx, weight: w });
+                                }}
+                                onMouseLeave={() => setHoveredCell(null)}
+                                onClick={() => {
+                                  audioTelemetry.playTone(380 + (idx % 8) * 45, "sine", 0.08);
+                                  setAttentionWeights((prev) => {
+                                    const next = [...prev];
+                                    next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
+                                    return next;
+                                  });
+                                }}
+                                className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${
+                                  isRecomputing ? "cell-recomputing" : ""
+                                }`}
+                                style={{
+                                  backgroundColor:
+                                    idx === 47 ? "var(--tertiary)" : "var(--primary)",
+                                  opacity: isHovered ? 1 : opacity,
+                                  transform: isHovered ? "scale(1.35)" : "scale(1)",
+                                  zIndex: isHovered ? 10 : 1,
+                                  boxShadow: isHovered ? "0 0 10px rgba(236,194,70,0.8)" : "none",
+                                  animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+
+                        {/* Dynamic Readout */}
+                        <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px]">
+                          {hoveredCell ? (
+                            <span className="text-primary font-bold">
+                              [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] ·
+                              α_ij: {hoveredCell.weight.toFixed(3)} (Softmax)
+                            </span>
+                          ) : (
+                            <span className="text-cyan-spec font-medium">
+                              Σ_j α_ij = 1.000 · ROW-STOCHASTIC
+                            </span>
+                          )}
+                          <span className="text-tertiary">CONVERGED</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
