@@ -48,44 +48,67 @@ export function Interactive3DCore() {
     coreGroupRef.current = coreGroup;
     scene.add(coreGroup);
 
-    // Inner Geodesic Core (Icosahedron)
+    // Inner Geodesic Core (Icosahedron) with true dielectric transmission & dispersion
     const innerGeo = new THREE.IcosahedronGeometry(0.9, 1);
-    const innerMat = new THREE.MeshStandardMaterial({
+    const innerMat = new THREE.MeshPhysicalMaterial({
       color: 0x15d9c7,
-      metalness: 0.8,
-      roughness: 0.2,
-      wireframe: false,
-      transparent: true,
-      opacity: 0.85,
+      metalness: 0.0,
+      roughness: 0.14,
+      transmission: 0.92,
+      ior: 1.54,
+      thickness: 1.4,
+      attenuationColor: new THREE.Color(0x064e47),
+      attenuationDistance: 0.7,
+      dispersion: 0.06,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.08,
       emissive: 0x08524b,
-      emissiveIntensity: 0.6,
+      emissiveIntensity: 0.45,
+      transparent: true,
+      wireframe: false,
     });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
     coreGroup.add(innerMesh);
     materialsRef.current.push(innerMat);
 
-    // Outer Lattice Wireframe Cage (Dodecahedron)
+    // Outer Lattice Wireframe Cage (Pentagonal Dodecahedron via EdgesGeometry)
     const outerGeo = new THREE.DodecahedronGeometry(1.35, 1);
-    const outerWireMat = new THREE.MeshBasicMaterial({
+    const edgesGeo = new THREE.EdgesGeometry(outerGeo, 24);
+    const outerWireMat = new THREE.LineBasicMaterial({
       color: 0xecc246,
-      wireframe: true,
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.55,
     });
-    const outerWireMesh = new THREE.Mesh(outerGeo, outerWireMat);
+    const outerWireMesh = new THREE.LineSegments(edgesGeo, outerWireMat);
     coreGroup.add(outerWireMesh);
     materialsRef.current.push(outerWireMat);
 
-    // Node Vertices / Attention Anchors
+    // Node Vertices / Attention Anchors with Soft Photon Glow Sprites
     const vertexPointsGeo = new THREE.BufferGeometry();
     const posAttr = outerGeo.getAttribute("position");
     vertexPointsGeo.setAttribute("position", posAttr);
 
+    const pointCanvas = document.createElement("canvas");
+    pointCanvas.width = 32;
+    pointCanvas.height = 32;
+    const pctx = pointCanvas.getContext("2d");
+    if (pctx) {
+      const grad = pctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, "rgba(255, 255, 255, 1)");
+      grad.addColorStop(0.35, "rgba(236, 194, 70, 0.9)");
+      grad.addColorStop(0.7, "rgba(236, 194, 70, 0.25)");
+      grad.addColorStop(1, "rgba(236, 194, 70, 0)");
+      pctx.fillStyle = grad;
+      pctx.fillRect(0, 0, 32, 32);
+    }
+    const pointTexture = new THREE.CanvasTexture(pointCanvas);
+
     const pointMat = new THREE.PointsMaterial({
-      color: 0xecc246,
-      size: 0.08,
+      map: pointTexture,
+      size: 0.16,
       transparent: true,
-      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
     const vertexPoints = new THREE.Points(vertexPointsGeo, pointMat);
     coreGroup.add(vertexPoints);
@@ -147,10 +170,11 @@ export function Interactive3DCore() {
       coreGroup.rotation.x += velocity.x;
 
       previousMousePosition = { x: e.clientX, y: e.clientY };
-      setRotTelemetry({
-        x: Number((coreGroup.rotation.x % (Math.PI * 2)).toFixed(2)),
-        y: Number((coreGroup.rotation.y % (Math.PI * 2)).toFixed(2)),
-      });
+      if (rotTextRef.current) {
+        const px = (coreGroup.rotation.x % (Math.PI * 2)).toFixed(2);
+        const py = (coreGroup.rotation.y % (Math.PI * 2)).toFixed(2);
+        rotTextRef.current.textContent = `PITCH: ${Number(px) > 0 ? `+${px}` : px} | YAW: ${Number(py) > 0 ? `+${py}` : py}`;
+      }
     };
 
     const onMouseUp = () => {
@@ -282,8 +306,10 @@ export function Interactive3DCore() {
       // Clean disposal
       innerGeo.dispose();
       outerGeo.dispose();
+      edgesGeo.dispose();
       vertexPointsGeo.dispose();
       ringGeo.dispose();
+      pointTexture.dispose();
       activeMaterials.forEach((m) => m.dispose());
       renderer.dispose();
     };
@@ -292,7 +318,7 @@ export function Interactive3DCore() {
   // Wireframe toggle effect
   useEffect(() => {
     if (!materialsRef.current[0]) return;
-    (materialsRef.current[0] as THREE.MeshStandardMaterial).wireframe = wireframeOnly;
+    (materialsRef.current[0] as THREE.MeshPhysicalMaterial).wireframe = wireframeOnly;
   }, [wireframeOnly]);
 
   const triggerCorePulse = () => {

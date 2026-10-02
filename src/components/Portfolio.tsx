@@ -410,7 +410,7 @@ function TiltProjectCard({ project }: { project: Project }) {
           : undefined,
         transformStyle: "preserve-3d",
       }}
-      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative overflow-hidden group cursor-pointer`}
+      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative group cursor-pointer`}
     >
       <span className="hud-corner hud-corner-tl" />
       <span className="hud-corner hud-corner-tr" />
@@ -418,14 +418,16 @@ function TiltProjectCard({ project }: { project: Project }) {
       <span className="hud-corner hud-corner-br" />
 
       {/* Dynamic Cursor Spotlight Sheen */}
-      {tilt && (
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[3px] opacity-40 transition-opacity duration-150"
-          style={{
-            background: `radial-gradient(380px circle at ${(tilt.rawX * 100).toFixed(1)}% ${(tilt.rawY * 100).toFixed(1)}%, rgba(236,194,70,0.18), transparent 70%)`,
-          }}
-        />
-      )}
+      <div className="pointer-events-none absolute inset-0 rounded-[3px] overflow-hidden">
+        {tilt && (
+          <div
+            className="absolute inset-0 opacity-40 transition-opacity duration-150"
+            style={{
+              background: `radial-gradient(380px circle at ${(tilt.rawX * 100).toFixed(1)}% ${(tilt.rawY * 100).toFixed(1)}%, rgba(236,194,70,0.18), transparent 70%)`,
+            }}
+          />
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
         <h3 className="font-headline-lg text-white font-bold text-xl group-hover:text-primary transition-colors duration-200">
@@ -1249,7 +1251,7 @@ export function Portfolio() {
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 font-mono text-xs">
-                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-cyan-spec/60">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between group cursor-pointer hover:border-cyan-spec/60">
                     <span className="hud-corner hud-corner-tl" />
                     <span className="hud-corner hud-corner-tr" />
                     <span className="hud-corner hud-corner-bl" />
@@ -1264,7 +1266,7 @@ export function Portfolio() {
                       <span className="text-[11px] text-on-surface-variant">Specializations</span>
                     </div>
                   </div>
-                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-tertiary/60">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between group cursor-pointer hover:border-tertiary/60">
                     <span className="hud-corner hud-corner-tl" />
                     <span className="hud-corner hud-corner-tr" />
                     <span className="hud-corner hud-corner-bl" />
@@ -1281,7 +1283,7 @@ export function Portfolio() {
                       </span>
                     </div>
                   </div>
-                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between overflow-hidden group cursor-pointer hover:border-primary/60">
+                  <div className="cyber-card-interactive p-4 rounded bg-[#0d121a] border border-[#1e2736] flex flex-col justify-between group cursor-pointer hover:border-primary/60">
                     <span className="hud-corner hud-corner-tl" />
                     <span className="hud-corner hud-corner-tr" />
                     <span className="hud-corner hud-corner-bl" />
@@ -1443,7 +1445,7 @@ export function Portfolio() {
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-primary overflow-hidden group cursor-pointer hover:border-primary/80">
+                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-primary group cursor-pointer hover:border-primary/80">
                   <span className="hud-corner hud-corner-tl" />
                   <span className="hud-corner hud-corner-tr" />
                   <span className="hud-corner hud-corner-bl" />
@@ -1482,7 +1484,7 @@ export function Portfolio() {
                   </div>
                 </div>
 
-                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-cyan-spec overflow-hidden group cursor-pointer hover:border-cyan-spec/80">
+                <div className="hud-panel cyber-card-interactive p-6 rounded-[3px] flex flex-col justify-between gap-6 border-l-2 border-cyan-spec group cursor-pointer hover:border-cyan-spec/80">
                   <span className="hud-corner hud-corner-tl" />
                   <span className="hud-corner hud-corner-tr" />
                   <span className="hud-corner hud-corner-bl" />
@@ -1657,7 +1659,7 @@ export function Portfolio() {
                 {LEARNING_REPOS.map((repo) => (
                   <div
                     key={repo.title}
-                    className="hud-panel cyber-card-interactive p-5 rounded-[3px] flex flex-col justify-between gap-4 border border-[#202c3e] bg-[#090d14]/90 hover:border-cyan-spec/50 overflow-hidden group cursor-pointer"
+                    className="hud-panel cyber-card-interactive p-5 rounded-[3px] flex flex-col justify-between gap-4 border border-[#202c3e] bg-[#090d14]/90 hover:border-cyan-spec/50 group cursor-pointer"
                   >
                     <span className="hud-corner hud-corner-tl" />
                     <span className="hud-corner hud-corner-tr" />

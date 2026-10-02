@@ -498,76 +498,8 @@ main {
 .rail a:hover i {
   width: 27px;
 }
-.hero {
-  position: relative;
-  z-index: 2;
-  min-height: 100svh;
-  padding: 96px 7vw 60px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  align-items: center;
-  border-bottom: 1px solid var(--hairline);
-}
-.hero-meta {
-  position: absolute;
-  top: 86px;
-  left: 7vw;
-  right: 7vw;
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted-foreground);
-  font: 10px var(--font-mono);
-}
-.hero-meta span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.hero-copy {
-  max-width: 760px;
-  padding-top: 52px;
-}
-.eyebrow,
-.role-kicker,
-.overline,
-.stack {
-  font-family: var(--font-mono);
-}
-.eyebrow {
-  color: var(--muted-foreground);
-  font-size: 10px;
-  line-height: 1.7;
-}
-.eyebrow code {
-  color: var(--primary);
-}
-.status-line {
-  margin: 36px 0 13px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font: 10px var(--font-mono);
-  color: var(--primary);
-}
-.status-line i {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 16px var(--primary);
-  animation: pulse 2s ease-in-out infinite;
-}
-.role-kicker {
-  color: var(--muted-foreground);
-  font-size: 11px;
-}
-h1 {
-  margin: 15px 0 20px;
-  max-width: 680px;
-  font-size: clamp(4.2rem, 10vw, 9.6rem);
-  line-height: 0.81;
-  letter-spacing: 0;
-  font-weight: 600;
+.legacy-hero {
+  display: none;
 }
 .hero-role {
   margin: 0 0 8px;
