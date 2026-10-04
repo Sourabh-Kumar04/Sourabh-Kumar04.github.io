@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS",
+        content: "Sourabh-Kumar04",
       },
       {
         property: "og:description",
