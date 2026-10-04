@@ -70,6 +70,30 @@ body {
 #main-content-area > div > section[id="model-overview"] > .hud-panel:first-child {
   display: none;
 }
+.profile-extra-narrative {
+  display: none;
+}
+.project-filter {
+  display: none;
+}
+.reference-two-column {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.reference-two-column > section {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid #1e293b;
+  border-radius: 0.75rem;
+  background: #0e131a;
+}
+@media (max-width: 1024px) {
+  .reference-two-column {
+    grid-template-columns: 1fr;
+  }
+}
 #main-content-area .hud-panel {
   border-radius: 0.75rem;
   border-color: #1e293b;
@@ -101,6 +125,25 @@ body {
 }
 .project-pipeline-node {
   border-radius: 0.35rem;
+}
+.motion-card {
+  transform: none !important;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease !important;
+}
+.motion-card:hover {
+  transform: none !important;
+}
+.motion-card > .hud-corner,
+.hud-corner {
+  display: none;
+}
+.motion-card > .pointer-events-none {
+  display: none;
+}
+.attention-active {
+  animation: none !important;
 }
 .dashboard-status-chip,
 .dashboard-stack-chip {

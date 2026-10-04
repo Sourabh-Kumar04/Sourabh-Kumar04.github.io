@@ -13,7 +13,6 @@ import {
   X,
   ArrowRight,
   Menu,
-  GraduationCap,
   FolderGit2,
   Award,
   GitPullRequest,
@@ -35,15 +34,15 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { index: "00", id: "model-overview", label: "MODEL_OVERVIEW", meta: "IDENTITY" },
+  { index: "00", id: "model-overview", label: "OVERVIEW", meta: "IDENTITY" },
   { index: "01", id: "operator-profile", label: "OPERATOR_PROFILE", meta: "ABOUT" },
   { index: "02", id: "training-record", label: "TRAINING_RECORD", meta: "5" },
   { index: "03", id: "evaluation-set", label: "EVALUATION_SET", meta: "3" },
   { index: "04", id: "research-notes", label: "RESEARCH_NOTES", meta: "4" },
   { index: "05", id: "capability-schema", label: "CAPABILITY_SCHEMA", meta: "STACK" },
-  { index: "06", id: "external-validation", label: "EXTERNAL_VALIDATION", meta: "MERGED" },
+  { index: "06", id: "external-validation", label: "EXTERNAL_VAL", meta: "MERGED" },
   { index: "07", id: "limitations", label: "LIMITATIONS", meta: "HONEST" },
-  { index: "08", id: "contact-terminal", label: "MAINTAINER_CONTACT", meta: "PING" },
+  { index: "08", id: "contact-terminal", label: "CONTACT", meta: "PING" },
 ];
 
 interface Project {
@@ -162,7 +161,7 @@ const TECHNICAL_NOTES: LearningRepo[] = [
 
 // Mathematically grounded Transformer Attention: row-stochastic Softmax distribution
 function computeSoftmaxAttention(causal = false): number[] {
-  const numRows = 6;
+  const numRows = 8;
   const numCols = 8;
   const weights: number[] = [];
 
@@ -376,20 +375,6 @@ export function Portfolio() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
 
-  // Scroll depth tracking
-  const [scrollPercent, setScrollPercent] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      if (total > 0) {
-        setScrollPercent(Math.min(100, Math.max(0, (window.scrollY / total) * 100)));
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
   const [hoveredCell, setHoveredCell] = useState<{ index: number; weight: number } | null>(null);
@@ -490,14 +475,6 @@ export function Portfolio() {
     <div className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
       <Toaster position="bottom-right" theme="dark" richColors />
 
-      {/* VIEWPORT SCROLL PROGRESS */}
-      <div
-        className="scroll-progress fixed top-0 left-0 h-[2.5px] z-50 bg-gradient-to-r from-primary via-cyan-spec to-tertiary pointer-events-none"
-        style={{ transform: `scaleX(${scrollPercent / 100})` }}
-      >
-        <span className="scroll-progress-head" />
-      </div>
-
       {/* MOBILE SIDEBAR BACKDROP */}
       {sidebarOpen && (
         <div
@@ -516,18 +493,12 @@ export function Portfolio() {
           {/* Node Header */}
           <div className="px-4 py-2 flex items-center justify-between border-b border-[#1b2330]">
             <div className="flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
-              </span>
+              <FolderGit2 size={17} className="text-primary shrink-0" />
               <span className="sidebar-collapsible font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
-                Sourabh-Kumar04
+                MODEL CARD INDEX
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-label-telemetry text-[10px] text-primary/80 border border-primary/30 px-1.5 py-0.5 rounded-[2px] bg-primary/5">
-                <span className="sidebar-collapsible">AWS AIML Scholar'24</span>
-              </span>
               <button
                 type="button"
                 className="hidden lg:flex text-on-surface-variant hover:text-primary cursor-pointer"
@@ -583,45 +554,6 @@ export function Portfolio() {
             })}
           </nav>
         </div>
-
-        {/* Portfolio snapshot */}
-        <div
-          className={`${sidebarCollapsed ? "hidden" : ""} mx-3 p-3 rounded-[3px] bg-[#0d1219]/90 border border-[#222c3d] flex flex-col gap-2.5`}
-        >
-          <div className="flex items-center justify-between border-b border-[#1b2433] pb-1.5">
-            <span className="font-label-telemetry text-[10px] text-on-surface-variant uppercase flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              PORTFOLIO SNAPSHOT
-            </span>
-            <span className="font-code-mono-sm text-[10px] text-tertiary font-bold tracking-wider">
-              VERIFIED
-            </span>
-          </div>
-          <div className="font-code-mono-sm text-[11px] text-on-surface-variant flex flex-col gap-1.5">
-            <div className="flex justify-between">
-              <span>FEATURED SYSTEMS</span>
-              <span className="text-primary font-semibold">3 ARCHITECTURES</span>
-            </div>
-            <div className="flex justify-between">
-              <span>CERTIFICATIONS</span>
-              <span className="text-cyan-spec font-medium">5 SPECIALIZATIONS</span>
-            </div>
-            <div className="flex justify-between text-[10px]">
-              <span>UPSTREAM PR</span>
-              <span className="text-tertiary font-bold">SwarmLLM #48</span>
-            </div>
-            <div className="flex justify-between text-[10px]">
-              <span>FOCUS</span>
-              <span className="text-primary font-bold">AI SYSTEMS</span>
-            </div>
-            <div className="flex justify-between text-[10px] pt-0.5 border-t border-[#1b2433]">
-              <span>SCROLL DEPTH</span>
-              <span className="text-cyan-spec font-mono font-bold tabular-nums">
-                {scrollPercent.toFixed(0).padStart(3, "0")}%
-              </span>
-            </div>
-          </div>
-        </div>
       </aside>
 
       {/* MAIN VIEWPORT CONTAINER */}
@@ -645,11 +577,14 @@ export function Portfolio() {
               <img
                 src="/avatar.png"
                 alt="Sourabh Kumar"
-                className="w-5 h-5 rounded object-cover border border-primary/40"
+                className="w-6 h-6 rounded object-cover border border-primary/40"
               />
-              <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
               <span className="text-primary font-bold text-[10px] lg:text-[11px] tracking-wider uppercase">
-                Sourabh-Kumar04
+                SOURABH_KUMAR
+              </span>
+              <span className="text-on-surface-variant hidden sm:inline">|</span>
+              <span className="text-on-surface-variant hidden sm:inline text-[10px]">
+                MODEL_CARD v2.4
               </span>
             </div>
           </div>
@@ -733,25 +668,17 @@ export function Portfolio() {
                     <div className="flex flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-code-mono-sm text-[9px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-[2px] uppercase font-bold tracking-wider">
-                          AWS AI/ML SCHOLAR '24 · COMPUTER SCIENCE @ DELHI
+                          AWS AI/ML SCHOLAR '24
                         </span>
                         <span className="font-code-mono-sm text-[8.5px] text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-[2px] bg-tertiary/5 font-semibold">
-                          OPEN TO AI/ML INTERNSHIPS
+                          B.Sc. (Hons) CS @ UNIVERSITY OF DELHI (2023–2027)
                         </span>
                       </div>
-                      <p className="model-greeting" aria-label="Hello, I am Sourabh Kumar">
-                        <span>HELLO — I’M</span>
-                        <span className="text-primary"> SOURABH</span>
-                      </p>
                       <h1 className="hero-title-reveal font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
                         Sourabh Kumar
                       </h1>
                       <p className="hero-role-reveal font-code-mono-sm text-xs sm:text-sm text-primary font-medium tracking-wider uppercase pt-1">
-                        LLM / AGENT SYSTEMS ENGINEER // PEFT · RAG
-                      </p>
-                      <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
-                        <GraduationCap size={14} className="text-primary shrink-0" />
-                        COMPUTER SCIENCE · UNIVERSITY OF DELHI · 2023–2027
+                        Applied LLM Engineer // Agentic Systems &amp; PEFT Fine-Tuning
                       </p>
                     </div>
 
@@ -759,22 +686,26 @@ export function Portfolio() {
                       <p className="font-body-lg text-on-surface leading-relaxed text-[15px]">
                         I design and ship practical AI systems across retrieval, agent
                         orchestration, and parameter-efficient fine-tuning. As a Computer Science
-                        student at the University of Delhi, I’m looking for an AI/ML internship
-                        where careful experiments become reliable software.
+                        student at the University of Delhi, I build systems where careful
+                        mathematical experiments become reliable, reproducible software.
                       </p>
                     </div>
 
                     {/* Action Buttons: Optimized Recruiter Conversion & Provenance Hierarchy */}
                     <div className="flex flex-wrap items-center gap-3 pt-2 font-mono text-xs">
                       <a
-                        href="https://www.linkedin.com/in/sourabh-kumar04/"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#evaluation-set"
                         className="bg-primary text-black px-4 py-2 rounded-[2px] font-bold hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_16px_rgba(236,194,70,0.35)]"
-                        title="Open LinkedIn profile and resume details"
+                        title="View featured systems"
                       >
                         <FileText size={13} />
-                        <span>VIEW LINKEDIN PROFILE ↗</span>
+                        <span>VIEW PROJECTS ↗</span>
+                      </a>
+                      <a
+                        className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
+                        href="mailto:sourabhkumar01010101@gmail.com"
+                      >
+                        <span>WRITE EMAIL ↗</span>
                       </a>
                       <a
                         className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
@@ -785,18 +716,12 @@ export function Portfolio() {
                         <span>GITHUB ↗</span>
                       </a>
                       <a
-                        className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
-                        href="https://linkedin.com/in/sourabh-kumar04"
+                        href="https://www.linkedin.com/in/sourabh-kumar04/"
                         target="_blank"
                         rel="noopener noreferrer"
-                      >
-                        <span>LINKEDIN ↗</span>
-                      </a>
-                      <a
-                        href="#evaluation-set"
                         className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                       >
-                        <span>VIEW EVALUATIONS ↗</span>
+                        <span>LINKEDIN ↗</span>
                       </a>
                     </div>
                   </div>
@@ -805,7 +730,7 @@ export function Portfolio() {
                   <div className="lg:col-span-4 bg-[#0a0d14]/90 border border-[#222c3d] p-4 rounded-[3px] flex flex-col gap-3">
                     <div className="flex items-center justify-between border-b border-[#1b2331] pb-1.5">
                       <span className="px-2 py-0.5 rounded-[2px] bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold">
-                        ATTENTION DEMO / PORTFOLIO
+                        SELF-ATTENTION HEATMAP
                       </span>
                       <button
                         type="button"
@@ -818,27 +743,31 @@ export function Portfolio() {
                           size={11}
                           className={isRecomputing ? "animate-spin text-primary" : ""}
                         />
-                        <span>{isRecomputing ? "..." : "REPLAY DEMO"}</span>
+                        <span>{isRecomputing ? "..." : "SAMPLE"}</span>
                       </button>
                     </div>
 
                     <>
                       {/* Interactive 48-cell demo grid */}
                       <p className="text-[10px] text-on-surface-variant leading-relaxed">
-                        Illustrative attention demo across eight transformer heads. Values are
-                        simulated for this portfolio and do not represent live model inference.
+                        Demo visualization: simulated attention weights for an 8-head transformer.
+                        This is not live model output.
                       </p>
                       <div className="attention-labeled-grid">
                         <div className="attention-axis-corner">Q / K</div>
                         <div className="attention-column-labels">
-                          {Array.from({ length: 8 }, (_, index) => (
-                            <span key={index}>K{index + 1}</span>
-                          ))}
+                          {["<s>", "Applied", "LLM", "Agent", "PEFT", "LoRA", "Eval", "</s>"].map(
+                            (token) => (
+                              <span key={token}>{token}</span>
+                            ),
+                          )}
                         </div>
                         <div className="attention-row-labels">
-                          {Array.from({ length: 6 }, (_, index) => (
-                            <span key={index}>Q{index + 1}</span>
-                          ))}
+                          {["<s>", "Applied", "LLM", "Agent", "PEFT", "LoRA", "Eval", "</s>"].map(
+                            (token) => (
+                              <span key={token}>{token}</span>
+                            ),
+                          )}
                         </div>
                         <div
                           role="grid"
@@ -899,20 +828,6 @@ export function Portfolio() {
                           </span>
                         )}
                         <span className="text-tertiary">DEMO READY</span>
-                      </div>
-                      <div
-                        className="depth-meter"
-                        aria-label={`Page depth ${scrollPercent.toFixed(0)} percent`}
-                      >
-                        <div className="flex items-center justify-between font-label-telemetry text-[9px] text-on-surface-variant">
-                          <span>PAGE DEPTH</span>
-                          <span className="text-primary tabular-nums">
-                            {scrollPercent.toFixed(0)}%
-                          </span>
-                        </div>
-                        <div className="depth-track">
-                          <div className="depth-fill" style={{ width: `${scrollPercent}%` }} />
-                        </div>
                       </div>
                     </>
                   </div>
@@ -1021,16 +936,16 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[01]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    operator profile
+                    operator profile &amp; technical narrative
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
-                  PROFILE &amp; ARCHITECTURAL SPECIFICATION
+                  SYSTEM ARCHITECTURE LOG
                 </span>
               </div>
 
               {/* Core Narrative & Technical Parameter Matrix */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="profile-extra-narrative grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left: Engineering Bio & Trajectory */}
                 <div className="lg:col-span-7 hud-panel p-6 rounded-[3px] flex flex-col justify-between gap-5">
                   <div className="space-y-4">
@@ -1174,12 +1089,15 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 02: TRAINING RECORD */}
-            <section className="relative py-4 flex flex-col gap-6" id="training-record">
+            <section
+              className="relative py-4 px-4 sm:px-6 lg:px-8 flex flex-col gap-6 bg-[#0e131a] border border-[#1e293b] rounded-xl"
+              id="training-record"
+            >
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[02]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    training record
+                    training record &amp; verified checkpoints
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1268,11 +1186,11 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[03]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    evaluation set
+                    evaluation set: 3 production-grade systems
                   </h2>
                 </div>
 
-                <div className="flex items-center gap-1 font-code-mono-sm text-[11px]">
+                <div className="project-filter flex items-center gap-1 font-code-mono-sm text-[11px]">
                   {(["all", "peft", "agents", "ml"] as const).map((cat) => (
                     <button
                       key={cat}
@@ -1303,7 +1221,7 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[04]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    research notes
+                    research notes &amp; public notebooks
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1359,85 +1277,94 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 05: CAPABILITY SCHEMA */}
-            <section className="relative py-4 flex flex-col gap-6" id="capability-schema">
-              <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
-                <div className="flex items-center gap-2">
-                  <span className="font-code-mono-sm text-primary font-bold text-[14px]">[05]</span>
-                  <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    capability schema
-                  </h2>
-                </div>
-                <span className="font-label-telemetry text-on-surface-variant text-[11px]">
-                  SKILL MATRIX
-                </span>
-              </div>
-              <div className="hud-panel p-6 rounded-[3px] font-code-mono-sm text-[12px] space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
-                  <span className="text-primary font-bold w-32 shrink-0">languages:</span>
-                  <span className="text-white">Python · C++</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
-                  <span className="text-cyan-spec font-bold w-32 shrink-0">ml_core:</span>
-                  <span className="text-white">
-                    PyTorch · TensorFlow · LangChain · LangGraph · RAG · LoRA/PEFT
+            <div className="reference-two-column">
+              {/* SECTION 05: CAPABILITY SCHEMA */}
+              <section className="relative py-4 flex flex-col gap-6" id="capability-schema">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-code-mono-sm text-primary font-bold text-[14px]">
+                      [05]
+                    </span>
+                    <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
+                      capability schema
+                    </h2>
+                  </div>
+                  <span className="font-label-telemetry text-on-surface-variant text-[11px]">
+                    SKILL MATRIX
                   </span>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
-                  <span className="text-tertiary font-bold w-32 shrink-0">infra:</span>
-                  <span className="text-white">Docker · FastAPI</span>
+                <div className="hud-panel p-6 rounded-[3px] font-code-mono-sm text-[12px] space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
+                    <span className="text-primary font-bold w-32 shrink-0">languages:</span>
+                    <span className="text-white">Python · C++</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
+                    <span className="text-cyan-spec font-bold w-32 shrink-0">ml_core:</span>
+                    <span className="text-white">
+                      PyTorch · TensorFlow · LangChain · LangGraph · RAG · LoRA/PEFT
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2 border-b border-[#1b2331]">
+                    <span className="text-tertiary font-bold w-32 shrink-0">infra:</span>
+                    <span className="text-white">Docker · FastAPI</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                    <span className="text-on-surface-variant w-32 shrink-0">data_stores:</span>
+                    <span className="text-white">Redis · PostgreSQL · Qdrant</span>
+                  </div>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                  <span className="text-on-surface-variant w-32 shrink-0">data_stores:</span>
-                  <span className="text-white">Redis · PostgreSQL · Qdrant</span>
-                </div>
-              </div>
-            </section>
+              </section>
 
-            {/* SECTION 06: EXTERNAL VALIDATION */}
-            <section className="relative py-4 flex flex-col gap-6" id="external-validation">
-              <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
-                <div className="flex items-center gap-2">
-                  <span className="font-code-mono-sm text-primary font-bold text-[14px]">[06]</span>
-                  <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    external validation
-                  </h2>
+              {/* SECTION 06: EXTERNAL VALIDATION */}
+              <section className="relative py-4 flex flex-col gap-6" id="external-validation">
+                <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-code-mono-sm text-primary font-bold text-[14px]">
+                      [06]
+                    </span>
+                    <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
+                      external validation
+                    </h2>
+                  </div>
+                  <span className="font-label-telemetry text-on-surface-variant text-[11px]">
+                    OPEN-SOURCE CONTRIBUTION
+                  </span>
                 </div>
-                <span className="font-label-telemetry text-on-surface-variant text-[11px]">
-                  OPEN-SOURCE CONTRIBUTION
-                </span>
-              </div>
-              <div className="hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-2 border-primary">
-                <div className="text-primary font-mono text-sm font-bold flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-tertiary shrink-0" />
-                  <span>merged: PR #48 → Nehanth/swarmllm</span>
+                <div className="hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-2 border-primary">
+                  <div className="text-primary font-mono text-sm font-bold flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-tertiary shrink-0" />
+                    <span>merged: PR #48 → Nehanth/swarmllm</span>
+                  </div>
+                  <p className="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
+                    Contributed host output visibility controls and node-tag customization to a
+                    from-scratch WebGPU and WebRTC engine that splits a 27B-parameter model across
+                    browser tabs on different devices.
+                  </p>
+                  <div>
+                    <a
+                      href="https://github.com/Nehanth/swarmllm/commit/c6f47f70968d44e57cc848e528d2e27a118dddda"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary font-mono text-xs hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <span>view commit ↗</span>
+                      <ExternalLink size={13} className="shrink-0" />
+                    </a>
+                  </div>
                 </div>
-                <p className="font-body-md text-on-surface-variant text-[14px] leading-relaxed">
-                  Contributed host output visibility controls and node-tag customization to a
-                  from-scratch WebGPU and WebRTC engine that splits a 27B-parameter model across
-                  browser tabs on different devices.
-                </p>
-                <div>
-                  <a
-                    href="https://github.com/Nehanth/swarmllm/commit/c6f47f70968d44e57cc848e528d2e27a118dddda"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary font-mono text-xs hover:underline inline-flex items-center gap-1.5"
-                  >
-                    <span>view commit ↗</span>
-                    <ExternalLink size={13} className="shrink-0" />
-                  </a>
-                </div>
-              </div>
-            </section>
+              </section>
+            </div>
 
             {/* SECTION 07: LIMITATIONS */}
-            <section className="relative py-4 flex flex-col gap-6" id="limitations">
+            <section
+              className="relative py-4 px-4 sm:px-6 lg:px-8 flex flex-col gap-6 bg-[#0e131a] border border-[#1e293b] rounded-xl"
+              id="limitations"
+            >
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[07]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    growth areas
+                    limitations &amp; zero-ego growth frontiers
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1454,12 +1381,15 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 08: MAINTAINER CONTACT */}
-            <section className="relative py-4 flex flex-col gap-6" id="contact-terminal">
+            <section
+              className="relative py-4 px-4 sm:px-6 lg:px-8 flex flex-col gap-6 bg-[#0e131a] border border-[#1e293b] rounded-xl"
+              id="contact-terminal"
+            >
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[08]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    maintainer contact
+                    direct communication channels // get in touch
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1495,19 +1425,48 @@ export function Portfolio() {
                         </span>
                         <span className="text-tertiary font-bold">SECURE DISPATCH GATEWAY</span>
                       </div>
-                      <label htmlFor="contact-email" className="sr-only">
-                        Your email address
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label className="flex flex-col gap-1 text-[10px] text-on-surface-variant uppercase">
+                          <span>&gt; CALLER_IDENTITY / NAME</span>
+                          <input
+                            id="contact-name"
+                            name="name"
+                            className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors normal-case"
+                            placeholder="Your name"
+                            required
+                            type="text"
+                            autoComplete="name"
+                            disabled={formStatus === "sending"}
+                          />
+                        </label>
+                        <label className="flex flex-col gap-1 text-[10px] text-on-surface-variant uppercase">
+                          <span>&gt; RETURN_PATH / EMAIL</span>
+                          <input
+                            id="contact-email"
+                            name="email"
+                            className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors normal-case"
+                            placeholder="recruiter@lab.ai"
+                            required
+                            type="email"
+                            autoComplete="email"
+                            disabled={formStatus === "sending"}
+                          />
+                        </label>
+                      </div>
+                      <label className="flex flex-col gap-1 text-[10px] text-on-surface-variant uppercase">
+                        <span>&gt; TRANSMISSION_SUBJECT</span>
+                        <select
+                          name="subject"
+                          defaultValue="collaboration"
+                          className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors"
+                          disabled={formStatus === "sending"}
+                        >
+                          <option value="collaboration">Project Collaboration</option>
+                          <option value="architecture">System Architecture Inquiry</option>
+                          <option value="internship">AI/ML Internship</option>
+                          <option value="other">Other Transmission</option>
+                        </select>
                       </label>
-                      <input
-                        id="contact-email"
-                        name="email"
-                        className="bg-[#0a0d13] text-white px-3 py-2 rounded-[2px] border border-[#1f2838] focus:border-primary focus:outline-none transition-colors"
-                        placeholder="your-email@org.domain or recruiter@lab.ai"
-                        required
-                        type="email"
-                        autoComplete="email"
-                        disabled={formStatus === "sending"}
-                      />
                       <label htmlFor="contact-message" className="sr-only">
                         Message
                       </label>
@@ -1544,11 +1503,11 @@ export function Portfolio() {
                 <div className="lg:col-span-5 flex flex-col gap-4 font-code-mono-sm text-xs">
                   <div className="hud-panel p-6 rounded-[3px] flex flex-col gap-3">
                     <span className="text-[10px] text-primary font-bold uppercase tracking-wider pb-1 border-b border-[#1b2331]">
-                      STATUS &amp; REACHABILITY
+                      VERIFIED DIRECT CHANNELS
                     </span>
                     <p className="text-on-surface-variant text-[13px] font-sans leading-relaxed">
-                      Open to AI/ML internships and high-impact problems. Reach out directly via the
-                      Payload Console, GitHub, or LinkedIn.
+                      Open to AI/ML internships, collaborations, and high-impact engineering
+                      problems. Reach out directly through the verified channels below.
                     </p>
                     <div className="space-y-1.5 pt-2 border-t border-[#1b2331]">
                       <div className="flex justify-between">
@@ -1561,6 +1520,13 @@ export function Portfolio() {
                       </div>
                     </div>
                     <div className="pt-2 flex flex-col gap-2">
+                      <a
+                        href="mailto:sourabhkumar01010101@gmail.com"
+                        className="text-primary hover:underline flex items-center justify-between gap-2 p-2 rounded bg-[#0b1018] border border-[#1e2a3c]"
+                      >
+                        <span>email: sourabhkumar01010101@gmail.com</span>
+                        <Mail size={12} />
+                      </a>
                       <a
                         href="https://github.com/Sourabh-Kumar04/"
                         target="_blank"
@@ -1588,25 +1554,9 @@ export function Portfolio() {
         </main>
 
         {/* FOOTER TELEMETRY STATUS */}
-        <footer className="w-full bg-[#080b0f]/90 border-t border-[#1d2737] py-4 px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 font-label-telemetry text-[11px] text-on-surface-variant">
-          <div className="flex items-center gap-3">
-            <span>AI/ML PORTFOLIO // SOURABH KUMAR</span>
-            <span className="text-outline-variant">·</span>
-            <span className="text-primary font-bold">SOURABH KUMAR</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="font-code-mono-sm text-[10px] text-on-surface-variant/80">
-              AWS AIML Scholar'24
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="text-cyan-spec hover:underline cursor-pointer"
-            >
-              BACK TO TOP ↑
-            </button>
+        <footer className="w-full bg-[#0e131a] border-t border-[#1e293b] py-5 px-4 lg:px-6 flex items-center justify-center font-label-telemetry text-[10px] text-on-surface-variant">
+          <div className="text-center uppercase tracking-wider">
+            © 2025 SOURABH KUMAR · ARCHITECTED FOR DETERMINISTIC REPRODUCIBILITY
           </div>
         </footer>
       </div>
