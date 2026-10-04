@@ -4,12 +4,9 @@ import { CommandPalette } from "./CommandPalette";
 import { Toaster } from "./ui/sonner";
 import {
   FileText,
-  Code2,
   Cpu,
   Sparkles,
   RefreshCw,
-  Copy,
-  Check,
   ExternalLink,
   HardDrive,
   CheckCircle2,
@@ -161,109 +158,6 @@ const TECHNICAL_NOTES: LearningRepo[] = [
   },
 ];
 
-// Production code snippets for the Evaluation section
-const CODE_SNIPPETS = [
-  {
-    id: "peft-lora",
-    title: "lora_peft_config.py",
-    language: "python",
-    desc: "Parameter-Efficient Fine-Tuning configuration for Llama-3-8B adapter injection.",
-    code: `from peft import LoraConfig, get_peft_model, TaskType
-from transformers import AutoModelForCausalLM, BitsAndBytesConfig
-
-bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype="bfloat16",
-    bnb_4bit_use_double_quant=True,
-)
-
-lora_config = LoraConfig(
-    r=16,
-    lora_alpha=32,
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-    lora_dropout=0.05,
-    bias="none",
-    task_type=TaskType.CAUSAL_LM,
-)
-
-model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Meta-Llama-3-8B-Instruct",
-    quantization_config=bnb_config,
-    device_map="auto"
-)
-model = prepare_model_for_kbit_training(model)
-model = get_peft_model(model, lora_config)
-model.print_trainable_parameters()
-# trainable params: 41,943,040 (all 7 linear projections) || all params: 8,072,204,288 || trainable%: 0.519%
-# (or 13,631,488 / 0.169% when targeting q, k, v, o attention projections only)`,
-  },
-  {
-    id: "langgraph-agent",
-    title: "agent_supervisor_dag.py",
-    language: "python",
-    desc: "Multi-agent deterministic supervisor routing DAG in LangGraph with human review checkpoint.",
-    code: `from typing import TypedDict, Annotated, Sequence
-from langchain_core.messages import BaseMessage
-from langgraph.graph import StateGraph, END
-
-class AgentState(TypedDict):
-    messages: Sequence[BaseMessage]
-    next_step: str
-    dataset_quality_score: float
-    human_approved: bool
-
-def supervisor_router(state: AgentState) -> str:
-    """Deterministic routing function based on state metadata."""
-    if state["dataset_quality_score"] < 0.85:
-        return "synthetic_synthesizer"
-    if not state.get("human_approved", False):
-        return "human_review_gate"
-    return "peft_fine_tune_worker"
-
-workflow = StateGraph(AgentState)
-workflow.add_node("dataset_miner", dataset_miner_node)
-workflow.add_node("synthetic_synthesizer", synthesizer_node)
-workflow.add_node("human_review_gate", human_review_node)
-workflow.add_node("peft_fine_tune_worker", trainer_node)
-
-workflow.add_conditional_edges("supervisor", supervisor_router)
-app = workflow.compile(checkpointer=MemorySaver())`,
-  },
-  {
-    id: "swarm-webgpu",
-    title: "webgpu_tensor_worker.ts",
-    language: "typescript",
-    desc: "Decentralized inference layer partition for browser WebGPU workers (SwarmLLM PR #48).",
-    code: `// SwarmLLM WebGPU Sharded Worker Subroutine
-export class DistributedTensorWorker {
-  private device!: GPUDevice;
-  private layerStartIdx: number;
-  private layerEndIdx: number;
-
-  constructor(start: number, end: number) {
-    this.layerStartIdx = start;
-    this.layerEndIdx = end;
-  }
-
-  async initialize() {
-    const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
-    this.device = await adapter!.requestDevice();
-  }
-
-  async computeLayerPass(hiddenStates: Float32Array): Promise<Float32Array> {
-    // Dispatch forward pass for assigned layer slice [layerStartIdx .. layerEndIdx]
-    const bufferIn = this.device.createBuffer({
-      size: hiddenStates.byteLength,
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    });
-    // Stream intermediate activations via peer-to-peer WebRTC data channels
-    return await this.executePipeline(bufferIn);
-  }
-}`,
-  },
-];
-
 // Mathematically grounded Transformer Attention: row-stochastic Softmax distribution
 function computeSoftmaxAttention(causal = false): number[] {
   const numRows = 6;
@@ -364,23 +258,28 @@ function TiltProjectCard({ project }: { project: Project }) {
     setTilt(null);
   };
 
+  const categoryAccent =
+    project.category === "peft" ? "#ecc246" : project.category === "agents" ? "#15d9c7" : "#4ae176";
+  const cardStyle = {
+    "--card-accent": categoryAccent,
+    transform: tilt
+      ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) translateY(-8px) scale(1.018) translateZ(12px)`
+      : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1) translateZ(0px)",
+    transition: tilt
+      ? "transform 0.08s ease-out, box-shadow 0.15s ease-out"
+      : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease-out",
+    boxShadow: tilt
+      ? "0 22px 45px -8px rgba(0, 0, 0, 0.85), 0 0 25px rgba(236, 194, 70, 0.18)"
+      : undefined,
+    transformStyle: "preserve-3d",
+  } as React.CSSProperties;
+
   return (
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
-        transform: tilt
-          ? `perspective(1000px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) translateY(-8px) scale(1.018) translateZ(12px)`
-          : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1) translateZ(0px)",
-        transition: tilt
-          ? "transform 0.08s ease-out, box-shadow 0.15s ease-out"
-          : "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease-out",
-        boxShadow: tilt
-          ? "0 22px 45px -8px rgba(0, 0, 0, 0.85), 0 0 25px rgba(236, 194, 70, 0.18)"
-          : undefined,
-        transformStyle: "preserve-3d",
-      }}
+      style={cardStyle}
       className={`hud-panel motion-card p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative group cursor-pointer`}
     >
       <span className="hud-corner hud-corner-tl" />
@@ -453,9 +352,6 @@ export function Portfolio() {
   const [commandOpen, setCommandOpen] = useState(false);
   const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
   const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
-  const [evaluationTab, setEvaluationTab] = useState<"projects" | "code">("projects");
-  const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
-  const [copiedSnippet, setCopiedSnippet] = useState(false);
 
   // Scroll depth tracking
   const [scrollPercent, setScrollPercent] = useState(0);
@@ -561,39 +457,23 @@ export function Portfolio() {
     setTimeout(() => setIsRecomputing(false), 450);
   };
 
-  // Copy active code snippet
-  const handleCopySnippet = async (code: string) => {
-    try {
-      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(code);
-      setCopiedSnippet(true);
-      toast.success("Code copied", { description: "Snippet saved to clipboard." });
-      window.setTimeout(() => setCopiedSnippet(false), 2000);
-    } catch {
-      toast.error("Copy failed", { description: "Clipboard access is unavailable." });
-    }
-  };
-
   // Filtered projects list
   const filteredProjects = useMemo(() => {
     if (projectFilter === "all") return PROJECTS;
     return PROJECTS.filter((p) => p.category === projectFilter);
   }, [projectFilter]);
 
-  const activeSnippet = useMemo(
-    () => CODE_SNIPPETS.find((s) => s.id === activeSnippetId) ?? CODE_SNIPPETS[0]!,
-    [activeSnippetId],
-  );
-
   return (
     <div className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
       <Toaster position="bottom-right" theme="dark" richColors />
 
-      {/* VIEWPORT SCROLL PROGRESS TELEMETRY BAR */}
+      {/* VIEWPORT SCROLL PROGRESS */}
       <div
-        className="fixed top-0 left-0 h-[2.5px] z-50 bg-gradient-to-r from-primary via-cyan-spec to-tertiary transition-all duration-75 shadow-[0_0_10px_rgba(236,194,70,0.8)] pointer-events-none"
-        style={{ width: `${scrollPercent}%` }}
-      />
+        className="scroll-progress fixed top-0 left-0 h-[2.5px] z-50 bg-gradient-to-r from-primary via-cyan-spec to-tertiary pointer-events-none"
+        style={{ transform: `scaleX(${scrollPercent / 100})` }}
+      >
+        <span className="scroll-progress-head" />
+      </div>
 
       {/* COMMAND PALETTE MODAL */}
       <CommandPalette
@@ -1331,59 +1211,21 @@ export function Portfolio() {
                   </h2>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Mode Toggle: Projects vs Code */}
-                  <div className="flex items-center p-0.5 rounded-[2px] bg-[#0c121a] border border-[#212c3d] font-mono text-[11px]">
+                <div className="flex items-center gap-1 font-code-mono-sm text-[11px]">
+                  {(["all", "peft", "agents", "ml"] as const).map((cat) => (
                     <button
+                      key={cat}
                       type="button"
-                      onClick={() => {
-                        setEvaluationTab("projects");
-                      }}
-                      className={`px-3 py-1 rounded-[1px] transition-all cursor-pointer ${
-                        evaluationTab === "projects"
+                      onClick={() => setProjectFilter(cat)}
+                      className={`px-2 py-1 rounded-[2px] uppercase transition-all cursor-pointer ${
+                        projectFilter === cat
                           ? "bg-primary text-black font-bold"
-                          : "text-on-surface-variant hover:text-white"
+                          : "bg-[#101620] text-on-surface-variant hover:text-white border border-[#212c3d]"
                       }`}
                     >
-                      PROJECTS
+                      {cat}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEvaluationTab("code");
-                      }}
-                      className={`px-3 py-1 rounded-[1px] transition-all flex items-center gap-1.5 cursor-pointer ${
-                        evaluationTab === "code"
-                          ? "bg-cyan-spec text-black font-bold"
-                          : "text-on-surface-variant hover:text-white"
-                      }`}
-                    >
-                      <Code2 size={12} />
-                      IMPLEMENTATION NOTES
-                    </button>
-                  </div>
-
-                  {/* Filter Tabs (when in projects mode) */}
-                  {evaluationTab === "projects" && (
-                    <div className="flex items-center gap-1 font-code-mono-sm text-[11px]">
-                      {(["all", "peft", "agents", "ml"] as const).map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => {
-                            setProjectFilter(cat);
-                          }}
-                          className={`px-2 py-1 rounded-[2px] uppercase transition-all cursor-pointer ${
-                            projectFilter === cat
-                              ? "bg-primary text-black font-bold"
-                              : "bg-[#101620] text-on-surface-variant hover:text-white border border-[#212c3d]"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
 
@@ -1393,55 +1235,11 @@ export function Portfolio() {
                 Each card highlights the engineering path and the evidence behind the result.
               </p>
 
-              {evaluationTab === "projects" ? (
-                <div className="flex flex-col gap-6">
-                  {filteredProjects.map((p) => (
-                    <TiltProjectCard key={p.title} project={p} />
-                  ))}
-                </div>
-              ) : (
-                /* IMPLEMENTATION NOTES VIEWER */
-                <div className="hud-panel p-5 rounded-[3px] border border-[#212c3d] bg-[#090d14]/90 space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1c2535] pb-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {CODE_SNIPPETS.map((snippet) => (
-                        <button
-                          key={snippet.id}
-                          onClick={() => {
-                            setActiveSnippetId(snippet.id);
-                          }}
-                          className={`px-3 py-1.5 rounded-[2px] font-mono text-xs border transition-all cursor-pointer ${
-                            activeSnippetId === snippet.id
-                              ? "border-cyan-spec bg-cyan-spec/10 text-cyan-spec font-bold"
-                              : "border-[#1e2736] bg-[#0c121a] text-on-surface-variant hover:text-white"
-                          }`}
-                        >
-                          {snippet.title}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => handleCopySnippet(activeSnippet.code)}
-                      className="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 rounded-[2px] font-mono text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      {copiedSnippet ? <Check size={12} /> : <Copy size={12} />}
-                      <span>{copiedSnippet ? "COPIED" : "COPY SNIPPET"}</span>
-                    </button>
-                  </div>
-
-                  <p className="text-on-surface-variant font-mono text-xs">{activeSnippet.desc}</p>
-
-                  <div className="relative rounded-[2px] overflow-hidden border border-[#1e283b] bg-[#06080c]">
-                    <div className="px-3 py-1.5 bg-[#0e141f] border-b border-[#1e283b] flex items-center justify-between font-mono text-[11px] text-on-surface-variant">
-                      <span className="text-primary">{activeSnippet.title}</span>
-                      <span>UTF-8 // {activeSnippet.language.toUpperCase()}</span>
-                    </div>
-                    <pre className="p-4 overflow-x-auto text-[12px] font-mono leading-relaxed text-[#d7e0ea] selection:bg-primary selection:text-black">
-                      <code>{activeSnippet.code}</code>
-                    </pre>
-                  </div>
-                </div>
-              )}
+              <div className="flex flex-col gap-6">
+                {filteredProjects.map((p) => (
+                  <TiltProjectCard key={p.title} project={p} />
+                ))}
+              </div>
             </section>
 
             {/* SECTION 04: RESEARCH NOTES */}

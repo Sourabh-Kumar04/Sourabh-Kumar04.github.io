@@ -65,7 +65,7 @@ const SECTION_ITEMS = [
     id: "learning-repos",
     label: "[04] RESEARCH_NOTES",
     icon: BookOpen,
-    desc: "Selected learning repositories and implementation notes",
+    desc: "Selected learning repositories and technical references",
   },
   {
     id: "capabilities",

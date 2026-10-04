@@ -53,6 +53,24 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+.scroll-progress {
+  width: 100%;
+  transform-origin: left center;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 14px rgba(21, 217, 199, 0.48);
+}
+.scroll-progress-head {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 9px rgba(236, 194, 70, 0.95);
+  transform: translate(50%, -50%);
+}
 ::selection {
   background: var(--primary);
   color: #000;
@@ -95,7 +113,7 @@ pre,
     transform 0.25s ease;
 }
 .hud-panel:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-2px);
   border-color: rgba(236, 194, 70, 0.4);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.6),
@@ -166,16 +184,52 @@ pre,
 .motion-card:hover::before {
   transform: translateX(120%);
 }
+.cyber-card-interactive::after {
+  position: absolute;
+  inset: 0.45rem;
+  content: "";
+  pointer-events: none;
+  border: 1px solid rgba(21, 217, 199, 0.08);
+  opacity: 0;
+  transform: scale(0.985);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cyber-card-interactive:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
 .motion-card {
   overflow: hidden;
   isolation: isolate;
+  background:
+    radial-gradient(
+      circle at 92% 8%,
+      color-mix(in srgb, var(--card-accent) 14%, transparent),
+      transparent 34%
+    ),
+    linear-gradient(145deg, rgba(15, 20, 29, 0.98), rgba(8, 12, 18, 0.96));
+  border-top-color: color-mix(in srgb, var(--card-accent) 38%, #1e2736);
+  border-right-color: color-mix(in srgb, var(--card-accent) 18%, #1e2736);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+.motion-card:hover {
+  border-top-color: color-mix(in srgb, var(--card-accent) 72%, white 8%);
+  border-right-color: color-mix(in srgb, var(--card-accent) 48%, #1e2736);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.85),
+    0 0 30px color-mix(in srgb, var(--card-accent) 18%, transparent);
 }
 .motion-card::after {
   position: absolute;
   inset: 0.45rem;
   content: "";
   pointer-events: none;
-  border: 1px solid rgba(236, 194, 70, 0.12);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 32%, transparent);
   opacity: 0;
   transform: scale(0.97);
   transition:
@@ -186,11 +240,14 @@ pre,
   opacity: 1;
   transform: scale(1);
 }
+.motion-card .text-cyan-spec {
+  color: color-mix(in srgb, var(--card-accent) 72%, #15d9c7);
+}
 .cyber-card-interactive:hover {
-  transform: translateY(-5px);
+  transform: translateY(-7px) scale(1.008);
   box-shadow:
-    0 16px 36px -4px rgba(0, 0, 0, 0.75),
-    0 0 20px rgba(236, 194, 70, 0.16);
+    0 20px 42px -8px rgba(0, 0, 0, 0.8),
+    0 0 26px rgba(236, 194, 70, 0.15);
 }
 .cell-recomputing {
   animation: attention-ripple 0.4s ease-out;
