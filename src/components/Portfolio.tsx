@@ -22,8 +22,6 @@ import {
   Send,
   Github,
   Linkedin,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 interface NavLink {
@@ -368,7 +366,6 @@ function TiltProjectCard({ project, index }: { project: Project; index: number }
 export function Portfolio() {
   const [activeSection, setActiveSection] = useState("model-overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
@@ -381,6 +378,14 @@ export function Portfolio() {
       setAttentionPulseIndex((previous) => (previous + 1) % INITIAL_WEIGHTS.length);
     }, 900);
     return () => window.clearInterval(pulseTimer);
+  }, []);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSidebarOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
   // Payload console dispatch state
@@ -461,21 +466,21 @@ export function Portfolio() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
+    <div className="site-shell relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
       <Toaster position="bottom-right" theme="dark" richColors />
 
       {/* MOBILE SIDEBAR BACKDROP */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden"
+          className="mobile-sidebar-backdrop fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* FIXED LEFT NAVIGATION CONSOLE */}
       <aside
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] ${sidebarCollapsed ? "lg:w-16 sidebar-collapsed" : "lg:w-64"} w-64 max-w-[calc(100vw-1rem)] bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto transition-[width,transform] duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        className={`model-card-sidebar bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto ${
+          sidebarOpen ? "sidebar-open" : ""
         }`}
       >
         <div className="flex flex-col gap-3">
@@ -487,19 +492,10 @@ export function Portfolio() {
                 MODEL CARD INDEX
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
-                className="hidden lg:flex text-on-surface-variant hover:text-primary cursor-pointer"
-                onClick={() => setSidebarCollapsed((previous) => !previous)}
-                aria-label={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
-                title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
-              >
-                {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-              </button>
-              <button
-                type="button"
-                className="lg:hidden text-on-surface-variant hover:text-white cursor-pointer"
+                className="mobile-only-control text-on-surface-variant hover:text-white cursor-pointer"
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close navigation"
               >
@@ -546,16 +542,14 @@ export function Portfolio() {
       </aside>
 
       {/* MAIN VIEWPORT CONTAINER */}
-      <div className={`relative z-20 ${sidebarCollapsed ? "lg:pl-16" : "lg:pl-64"}`}>
+      <div className="main-viewport relative z-20 min-w-0">
         {/* TOP MISSION CONTROL HUD */}
-        <header
-          className={`fixed top-0 right-0 h-16 bg-[#090d13]/90 backdrop-blur-xl z-40 border-b border-[#1d2737] flex items-center justify-between px-4 lg:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.7)] ${sidebarCollapsed ? "lg:left-16" : "lg:left-64"} left-0`}
-        >
+        <header className="site-header sticky top-0 w-full h-16 bg-[#090d13]/95 backdrop-blur-xl z-40 border-b border-[#1d2737] flex items-center justify-between px-4 lg:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.7)]">
           <div className="flex items-center gap-3 lg:gap-4 font-code-mono-sm text-code-mono-sm">
             {/* Mobile Menu Button */}
             <button
               type="button"
-              className="lg:hidden text-primary hover:text-white p-1 cursor-pointer"
+              className="mobile-only-control text-primary hover:text-white p-1 cursor-pointer"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open navigation menu"
             >
@@ -630,7 +624,7 @@ export function Portfolio() {
         </header>
 
         {/* MAIN INTERACTIVE CONTENT SURFACE */}
-        <main className="relative pt-20 w-full px-4 sm:px-6 lg:px-10 min-h-screen">
+        <main className="relative w-full min-w-0 px-4 sm:px-6 lg:px-10 min-h-screen">
           <div className="flex flex-col w-full text-on-surface pb-24 max-w-7xl mx-auto space-y-12">
             {/* SECTION 00: MODEL OVERVIEW */}
             <section className="relative pt-4 flex flex-col gap-6" id="model-overview">
