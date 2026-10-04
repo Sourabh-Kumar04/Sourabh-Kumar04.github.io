@@ -36,15 +36,15 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { index: "00", id: "overview", label: "OVERVIEW", meta: "HERO" },
-  { index: "01", id: "model-details", label: "ABOUT_ME", meta: "PROFILE" },
-  { index: "02", id: "training-data", label: "EDUCATION", meta: "5" },
-  { index: "03", id: "evaluation", label: "SELECTED_WORK", meta: "3" },
-  { index: "04", id: "learning-repos", label: "TECHNICAL_NOTES", meta: "4" },
-  { index: "05", id: "capabilities", label: "SKILLS", meta: "STACK" },
-  { index: "06", id: "external-validation", label: "OPEN_SOURCE", meta: "MERGED" },
-  { index: "07", id: "limitations", label: "GROWTH_AREAS", meta: "HONEST" },
-  { index: "08", id: "maintainer", label: "CONTACT", meta: "PING" },
+  { index: "00", id: "overview", label: "MODEL_OVERVIEW", meta: "IDENTITY" },
+  { index: "01", id: "model-details", label: "OPERATOR_PROFILE", meta: "ABOUT" },
+  { index: "02", id: "training-data", label: "TRAINING_RECORD", meta: "5" },
+  { index: "03", id: "evaluation", label: "EVALUATION_SET", meta: "3" },
+  { index: "04", id: "learning-repos", label: "RESEARCH_NOTES", meta: "4" },
+  { index: "05", id: "capabilities", label: "CAPABILITY_SCHEMA", meta: "STACK" },
+  { index: "06", id: "external-validation", label: "EXTERNAL_VALIDATION", meta: "MERGED" },
+  { index: "07", id: "limitations", label: "LIMITATIONS", meta: "HONEST" },
+  { index: "08", id: "maintainer", label: "MAINTAINER_CONTACT", meta: "PING" },
 ];
 
 interface Project {
@@ -160,8 +160,6 @@ const TECHNICAL_NOTES: LearningRepo[] = [
     topics: ["Tracing", "Debugging", "Evals", "Prompt Monitoring"],
   },
 ];
-
-const SKILL_NODES = ["LLM", "RAG", "AGENTS", "PEFT", "PYTORCH", "EVALS"];
 
 // Production code snippets for the Evaluation section
 const CODE_SNIPPETS = [
@@ -383,7 +381,7 @@ function TiltProjectCard({ project }: { project: Project }) {
           : undefined,
         transformStyle: "preserve-3d",
       }}
-      className={`hud-panel p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative group cursor-pointer`}
+      className={`hud-panel motion-card p-6 rounded-[3px] flex flex-col gap-4 border-l-4 ${project.borderAccent} will-change-transform relative group cursor-pointer`}
     >
       <span className="hud-corner hud-corner-tl" />
       <span className="hud-corner hud-corner-tr" />
@@ -820,7 +818,7 @@ export function Portfolio() {
         {/* MAIN INTERACTIVE CONTENT SURFACE */}
         <main className="relative pt-20 w-full px-4 sm:px-6 lg:px-10 min-h-screen">
           <div className="flex flex-col w-full text-on-surface pb-24 max-w-7xl mx-auto space-y-12">
-            {/* SECTION 00: HERO / OVERVIEW */}
+            {/* SECTION 00: MODEL OVERVIEW */}
             <section className="relative pt-4 flex flex-col gap-6" id="overview">
               <div className="hud-panel p-3 rounded-[3px] flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-primary">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-label-telemetry text-on-surface-variant">
@@ -840,7 +838,6 @@ export function Portfolio() {
               </div>
 
               <div className="hud-panel p-4 sm:p-6 lg:p-8 rounded-[4px] relative overflow-hidden border border-[#232c3d]">
-                <div className="scan-beam" />
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
                   <div className="lg:col-span-8 flex flex-col gap-6">
                     <div className="flex flex-col gap-1">
@@ -856,10 +853,10 @@ export function Portfolio() {
                         <span>HELLO, I’M</span>
                         <span className="text-primary"> SOURABH KUMAR</span>
                       </p>
-                      <h1 className="font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
+                      <h1 className="hero-title-reveal font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
                         Sourabh Kumar
                       </h1>
-                      <p className="font-code-mono-sm text-xs sm:text-sm text-primary font-medium tracking-wider uppercase pt-1">
+                      <p className="hero-role-reveal font-code-mono-sm text-xs sm:text-sm text-primary font-medium tracking-wider uppercase pt-1">
                         Applied LLM Engineer // Agentic Systems &amp; PEFT Fine-Tuning
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
@@ -1108,13 +1105,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 01: ABOUT ME */}
+            {/* SECTION 01: OPERATOR PROFILE */}
             <section className="relative py-4 flex flex-col gap-6" id="model-details">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[01]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    about me
+                    operator profile
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1235,17 +1232,17 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 02: EDUCATION */}
+            {/* SECTION 02: TRAINING RECORD */}
             <section className="relative py-4 flex flex-col gap-6" id="training-data">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[02]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    education
+                    training record
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
-                  EDUCATION + CERTIFICATIONS
+                  TRAINING DATA + CERTIFICATIONS
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1256,7 +1253,7 @@ export function Portfolio() {
                   <span className="hud-corner hud-corner-br" />
                   <div className="flex flex-col gap-4">
                     <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider">
-                      EDUCATION // DEGREE TRACK
+                      TRAINING RECORD // DEGREE TRACK
                     </span>
 
                     <div className="space-y-1.5 border-b border-[#1c2637] pb-3">
@@ -1324,13 +1321,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 03: EVALUATION */}
+            {/* SECTION 03: EVALUATION SET */}
             <section className="relative py-4 flex flex-col gap-6" id="evaluation">
               <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[03]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    selected work
+                    evaluation set
                   </h2>
                 </div>
 
@@ -1447,13 +1444,13 @@ export function Portfolio() {
               )}
             </section>
 
-            {/* SECTION 04: TECHNICAL NOTES */}
+            {/* SECTION 04: RESEARCH NOTES */}
             <section className="relative py-4 flex flex-col gap-6" id="learning-repos">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[04]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    technical notes
+                    research notes
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1509,13 +1506,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 05: CAPABILITIES */}
+            {/* SECTION 05: CAPABILITY SCHEMA */}
             <section className="relative py-4 flex flex-col gap-6" id="capabilities">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[05]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    skills
+                    capability schema
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1541,37 +1538,16 @@ export function Portfolio() {
                   <span className="text-on-surface-variant w-32 shrink-0">data_stores:</span>
                   <span className="text-white">Redis · PostgreSQL · Qdrant</span>
                 </div>
-                <div className="skills-orbit-wrap" aria-label="Animated AI skills map">
-                  <div className="skills-orbit">
-                    <div className="skills-orbit-ring skills-orbit-ring-outer" />
-                    <div className="skills-orbit-ring skills-orbit-ring-inner" />
-                    <div className="skills-orbit-core">
-                      MODEL
-                      <br />
-                      STACK
-                    </div>
-                    {SKILL_NODES.map((skill, index) => (
-                      <span
-                        key={skill}
-                        className="skill-orbit-node"
-                        style={{ "--skill-angle": `${index * 60}deg` } as React.CSSProperties}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="skills-orbit-caption">CAPABILITY MAP // ANIMATED OVERVIEW</span>
-                </div>
               </div>
             </section>
 
-            {/* SECTION 06: EXTERNAL_VALIDATION */}
+            {/* SECTION 06: EXTERNAL VALIDATION */}
             <section className="relative py-4 flex flex-col gap-6" id="external-validation">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[06]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    open-source contribution
+                    external validation
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1624,13 +1600,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 08: MAINTAINER / CONTACT */}
+            {/* SECTION 08: MAINTAINER CONTACT */}
             <section className="relative py-4 flex flex-col gap-6" id="maintainer">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[08]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    contact
+                    maintainer contact
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">

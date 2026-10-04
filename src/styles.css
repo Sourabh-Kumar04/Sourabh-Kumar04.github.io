@@ -89,7 +89,6 @@ pre,
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.5),
     0 16px 32px -4px rgba(0, 0, 0, 0.75);
-  animation: card-entrance 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease,
@@ -103,15 +102,6 @@ pre,
     0 0 15px rgba(236, 194, 70, 0.08);
 }
 
-.scan-beam {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(21, 217, 199, 0.8), transparent);
-  opacity: 0;
-  pointer-events: none;
-  animation: telemetry-scan 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
 .hud-corner {
   position: absolute;
   width: 7px;
@@ -151,10 +141,50 @@ pre,
 }
 .cyber-card-interactive {
   position: relative;
+  overflow: hidden;
   transition:
     transform 0.28s ease,
     box-shadow 0.28s ease,
     border-color 0.25s ease;
+}
+.cyber-card-interactive::before,
+.motion-card::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(21, 217, 199, 0.11) 48%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cyber-card-interactive:hover::before,
+.motion-card:hover::before {
+  transform: translateX(120%);
+}
+.motion-card {
+  overflow: hidden;
+  isolation: isolate;
+}
+.motion-card::after {
+  position: absolute;
+  inset: 0.45rem;
+  content: "";
+  pointer-events: none;
+  border: 1px solid rgba(236, 194, 70, 0.12);
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.motion-card:hover::after {
+  opacity: 1;
+  transform: scale(1);
 }
 .cyber-card-interactive:hover {
   transform: translateY(-5px);
@@ -178,6 +208,12 @@ pre,
 }
 .model-greeting .text-primary {
   animation: greeting-name 1s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-title-reveal {
+  animation: hero-title-reveal 0.75s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-role-reveal {
+  animation: hero-role-reveal 0.7s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .depth-meter {
   display: grid;
@@ -208,103 +244,6 @@ pre,
   content: "";
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
   animation: depth-scan 1.8s ease-in-out infinite;
-}
-.skills-orbit-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  min-height: 14rem;
-  padding: 1rem 0 0.25rem;
-  border-top: 1px solid #1b2331;
-}
-.skills-orbit {
-  position: relative;
-  width: 12rem;
-  height: 12rem;
-  display: grid;
-  place-items: center;
-}
-.skills-orbit-ring {
-  position: absolute;
-  inset: 1.1rem;
-  border: 1px solid rgba(21, 217, 199, 0.35);
-  border-radius: 50%;
-  animation: orbit-spin 16s linear infinite;
-}
-.skills-orbit-ring::after {
-  position: absolute;
-  top: -0.25rem;
-  left: 50%;
-  width: 0.45rem;
-  height: 0.45rem;
-  content: "";
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 10px var(--primary);
-}
-.skills-orbit-ring-inner {
-  inset: 2.55rem;
-  border-color: rgba(236, 194, 70, 0.35);
-  animation-duration: 10s;
-  animation-direction: reverse;
-}
-.skills-orbit-ring-inner::after {
-  background: var(--color-cyan-spec);
-  box-shadow: 0 0 10px var(--color-cyan-spec);
-}
-.skills-orbit-core {
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 4.6rem;
-  height: 4.6rem;
-  border: 1px solid rgba(236, 194, 70, 0.6);
-  border-radius: 50%;
-  color: var(--primary);
-  background: #0b1018;
-  box-shadow:
-    0 0 22px rgba(236, 194, 70, 0.16),
-    inset 0 0 18px rgba(21, 217, 199, 0.08);
-  font: 700 0.58rem/1.4 var(--font-mono);
-  letter-spacing: 0.08em;
-  text-align: center;
-  animation: core-breathe 2.8s ease-in-out infinite;
-}
-.skill-orbit-node {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 3.6rem;
-  margin: -0.5rem -1.8rem;
-  transform: rotate(var(--skill-angle)) translateY(-5.4rem) rotate(calc(var(--skill-angle) * -1));
-  color: var(--on-surface-variant);
-  font: 700 0.52rem/1 var(--font-mono);
-  letter-spacing: 0.04em;
-  text-align: center;
-  animation: skill-pulse 2.4s ease-in-out infinite;
-  animation-delay: calc(var(--skill-angle) * 0.01s);
-}
-.skills-orbit-caption {
-  max-width: 7rem;
-  color: var(--on-surface-variant);
-  font: 0.56rem/1.5 var(--font-mono);
-  letter-spacing: 0.08em;
-}
-
-@keyframes telemetry-scan {
-  0% {
-    top: 0%;
-    opacity: 0;
-  }
-  15%,
-  85% {
-    opacity: 0.4;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
 }
 @keyframes attention-ripple {
   0%,
@@ -351,6 +290,28 @@ pre,
     transform: translateX(0);
   }
 }
+@keyframes hero-title-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.8rem);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+@keyframes hero-role-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 @keyframes depth-scan {
   from {
     transform: translateX(-2rem);
@@ -359,35 +320,6 @@ pre,
     transform: translateX(2rem);
   }
 }
-@keyframes orbit-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes core-breathe {
-  50% {
-    box-shadow:
-      0 0 30px rgba(236, 194, 70, 0.3),
-      inset 0 0 22px rgba(21, 217, 199, 0.14);
-  }
-}
-@keyframes skill-pulse {
-  50% {
-    color: var(--primary);
-    text-shadow: 0 0 8px rgba(236, 194, 70, 0.55);
-  }
-}
-@keyframes card-entrance {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
