@@ -51,7 +51,60 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: Inter, var(--font-sans);
+}
+
+/* Reference dashboard shell: keep the AI/model-card content, but use the
+   same quiet surface hierarchy and generous panel geometry as the supplied
+   dashboard reference. */
+#main-content-area {
+  background: #07090c;
+}
+#main-content-area > div {
+  max-width: 80rem;
+  gap: 2.5rem;
+}
+#main-content-area > div > section {
+  scroll-margin-top: 5rem;
+}
+#main-content-area > div > section[id="model-overview"] > .hud-panel:first-child {
+  display: none;
+}
+#main-content-area .hud-panel {
+  border-radius: 0.75rem;
+  border-color: #1e293b;
+  background: #0e131a;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+}
+#main-content-area .hud-panel:hover {
+  transform: none;
+}
+#main-content-area
+  > div
+  > section:not([id="model-overview"]):not([id="operator-profile"]):not([id="evaluation-set"]):not(
+    [id="research-notes"]
+  ):not([id="capability-schema"]):not([id="external-validation"]):not([id="limitations"]):not(
+    [id="contact-terminal"]
+  ) {
+  background: #0e131a;
+  border: 1px solid #1e293b;
+  border-radius: 0.75rem;
+}
+.profile-milestone-card,
+.motion-card,
+.cyber-card-interactive {
+  border-radius: 0.75rem;
+}
+.project-pipeline,
+.attention-labeled-grid > [role="grid"] {
+  border-radius: 0.5rem;
+}
+.project-pipeline-node {
+  border-radius: 0.35rem;
+}
+.dashboard-status-chip,
+.dashboard-stack-chip {
+  border-radius: 0.25rem;
 }
 .scroll-progress {
   width: 100%;

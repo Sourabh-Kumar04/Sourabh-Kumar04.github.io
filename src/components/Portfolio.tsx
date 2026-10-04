@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
-import { CommandPalette } from "./CommandPalette";
 import { Toaster } from "./ui/sonner";
 import {
   FileText,
@@ -14,7 +13,6 @@ import {
   X,
   ArrowRight,
   Menu,
-  Brain,
   GraduationCap,
   FolderGit2,
   Award,
@@ -376,8 +374,6 @@ export function Portfolio() {
   const [activeSection, setActiveSection] = useState("model-overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [commandOpen, setCommandOpen] = useState(false);
-  const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
   const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
 
   // Scroll depth tracking
@@ -501,26 +497,6 @@ export function Portfolio() {
       >
         <span className="scroll-progress-head" />
       </div>
-
-      {/* COMMAND PALETTE MODAL */}
-      <CommandPalette
-        open={commandOpen}
-        onOpenChange={setCommandOpen}
-        toggleScanlines={() => setScanlinesEnabled((prev) => !prev)}
-        scanlinesEnabled={scanlinesEnabled}
-      />
-
-      {/* CRT SCANLINES & HIGH-FREQUENCY LATTICE OVERLAYS */}
-      {scanlinesEnabled && (
-        <div className="fixed inset-0 scanlines opacity-30 pointer-events-none z-10" />
-      )}
-      <div
-        className="fixed inset-0 pointer-events-none z-10 opacity-15"
-        style={{
-          backgroundImage: "radial-gradient(rgba(236,194,70,0.5) 0.65px, transparent 0.65px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
 
       {/* MOBILE SIDEBAR BACKDROP */}
       {sidebarOpen && (
@@ -676,18 +652,6 @@ export function Portfolio() {
                 Sourabh-Kumar04
               </span>
             </div>
-
-            {/* Command Palette Trigger */}
-            <button
-              type="button"
-              onClick={() => setCommandOpen(true)}
-              className="hidden md:inline-flex items-center gap-1.5 bg-[#121822] hover:bg-[#192230] text-on-surface-variant hover:text-primary px-2.5 py-1 rounded-[2px] border border-[#232e40] transition-colors text-[10px] cursor-pointer"
-              title="Open Terminal Palette (Cmd+K)"
-            >
-              <Brain size={12} className="text-primary" />
-              <span>CMD</span>
-              <kbd className="bg-[#1e2736] px-1 py-0.2 rounded text-[9px] text-primary">⌘K</kbd>
-            </button>
           </div>
 
           <div className="hidden xl:flex items-center justify-center gap-2 flex-1 px-6 min-w-0">
@@ -728,53 +692,15 @@ export function Portfolio() {
                 <Mail size={14} />
               </a>
             </div>
-            {/* Scroll Telemetry Depth Gauge */}
-            <div className="hidden lg:flex items-center gap-1.5 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] font-mono text-[10px] text-cyan-spec">
-              <span className="text-on-surface-variant text-[9px] font-medium">DEPTH</span>
-              <span className="font-bold tabular-nums">
-                {scrollPercent.toFixed(0).padStart(3, "0")}%
-              </span>
-            </div>
-
-            {/* Scanlines Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setScanlinesEnabled((prev) => !prev)}
-              className="hidden xl:inline-flex items-center gap-1 text-[10px] text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
-              title="Toggle CRT Scanlines"
-            >
-              <span className="text-outline-variant">::</span>
-              <span>CRT: {scanlinesEnabled ? "ON" : "OFF"}</span>
-            </button>
-
             {/* Sticky recruiter quick-actions */}
             <div className="flex items-center gap-1.5 font-mono">
               <a
-                href="https://www.linkedin.com/in/sourabh-kumar04/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-primary/10 border border-primary/40 text-primary hover:bg-primary hover:text-black px-2.5 py-1 rounded-[2px] text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer"
-              >
-                <FileText size={11} />
-                <span>LINKEDIN PROFILE</span>
-              </a>
-              <a
                 href="#contact-terminal"
-                className="hidden sm:inline-flex bg-cyan-spec/10 border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec hover:text-black px-2 py-1 rounded-[2px] text-[10px] font-bold transition-all items-center gap-1 cursor-pointer"
+                className="hidden sm:inline-flex bg-primary text-black hover:brightness-110 px-3 py-1.5 rounded-[2px] text-[10px] font-bold transition-all items-center gap-1 cursor-pointer"
               >
+                <Mail size={11} />
                 <span>CONTACT</span>
               </a>
-            </div>
-
-            <div className="flex items-center gap-2 pl-2 border-l border-[#243042]">
-              <button
-                type="button"
-                onClick={() => setCommandOpen(true)}
-                className="w-8 h-8 rounded-[3px] bg-primary/20 border border-primary/50 flex items-center justify-center hover:bg-primary/30 transition-colors cursor-pointer"
-                title="Open Command Palette (⌘K)"
-              >
-                <Brain size={16} className="text-primary" />
-              </button>
             </div>
           </div>
         </header>
@@ -1014,6 +940,12 @@ export function Portfolio() {
                       GEO
                     </span>
                     <span className="text-primary font-semibold">28.61°N, 77.20°E</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
+                      PRIMARY CORE
+                    </span>
+                    <span className="text-cyan-spec font-semibold">PyTorch · LangGraph</span>
                   </div>
                 </div>
               </div>
