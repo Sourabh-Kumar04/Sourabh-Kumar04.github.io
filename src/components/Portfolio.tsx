@@ -23,6 +23,10 @@ import {
   MessageSquare,
   Mail,
   Send,
+  Github,
+  Linkedin,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface NavLink {
@@ -33,15 +37,15 @@ interface NavLink {
 }
 
 const NAV_LINKS: NavLink[] = [
-  { index: "00", id: "overview", label: "MODEL_OVERVIEW", meta: "IDENTITY" },
-  { index: "01", id: "model-details", label: "OPERATOR_PROFILE", meta: "ABOUT" },
-  { index: "02", id: "training-data", label: "TRAINING_RECORD", meta: "5" },
-  { index: "03", id: "evaluation", label: "EVALUATION_SET", meta: "3" },
-  { index: "04", id: "learning-repos", label: "RESEARCH_NOTES", meta: "4" },
-  { index: "05", id: "capabilities", label: "CAPABILITY_SCHEMA", meta: "STACK" },
+  { index: "00", id: "model-overview", label: "MODEL_OVERVIEW", meta: "IDENTITY" },
+  { index: "01", id: "operator-profile", label: "OPERATOR_PROFILE", meta: "ABOUT" },
+  { index: "02", id: "training-record", label: "TRAINING_RECORD", meta: "5" },
+  { index: "03", id: "evaluation-set", label: "EVALUATION_SET", meta: "3" },
+  { index: "04", id: "research-notes", label: "RESEARCH_NOTES", meta: "4" },
+  { index: "05", id: "capability-schema", label: "CAPABILITY_SCHEMA", meta: "STACK" },
   { index: "06", id: "external-validation", label: "EXTERNAL_VALIDATION", meta: "MERGED" },
   { index: "07", id: "limitations", label: "LIMITATIONS", meta: "HONEST" },
-  { index: "08", id: "maintainer", label: "MAINTAINER_CONTACT", meta: "PING" },
+  { index: "08", id: "contact-terminal", label: "MAINTAINER_CONTACT", meta: "PING" },
 ];
 
 interface Project {
@@ -237,7 +241,7 @@ function AnimatedCounter({ end, duration = 1100 }: { end: number; duration?: num
   );
 }
 
-function TiltProjectCard({ project }: { project: Project }) {
+function TiltProjectCard({ project, index }: { project: Project; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState<{ x: number; y: number; rawX: number; rawY: number } | null>(
     null,
@@ -299,6 +303,10 @@ function TiltProjectCard({ project }: { project: Project }) {
         )}
       </div>
 
+      <div className="project-card-meta relative z-10">
+        <span>EVALUATION // {String(index).padStart(2, "0")}</span>
+        <span>{project.category.toUpperCase()} SYSTEM</span>
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
         <h3 className="font-headline-lg text-white font-bold text-xl group-hover:text-primary transition-colors duration-200">
           {project.title}
@@ -311,6 +319,21 @@ function TiltProjectCard({ project }: { project: Project }) {
       </div>
       <div className="font-code-mono-sm text-[12px] text-cyan-spec relative z-10">
         {project.stack}
+      </div>
+      <div className="project-pipeline relative z-10">
+        <span className="project-pipeline-label">EXECUTION FLOW</span>
+        <div className="project-pipeline-track">
+          {project.architecture.split(" → ").map((step, stepIndex, steps) => (
+            <React.Fragment key={step}>
+              <span
+                className={`project-pipeline-node ${stepIndex === steps.length - 1 ? "pipeline-terminal" : ""}`}
+              >
+                {step}
+              </span>
+              {stepIndex < steps.length - 1 && <span className="project-pipeline-arrow">→</span>}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
       <p className="font-body-md text-on-surface-variant text-[14px] relative z-10 leading-relaxed">
         {project.description}
@@ -347,8 +370,9 @@ function TiltProjectCard({ project }: { project: Project }) {
 }
 
 export function Portfolio() {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("model-overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
   const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
@@ -505,7 +529,7 @@ export function Portfolio() {
 
       {/* FIXED LEFT NAVIGATION CONSOLE */}
       <aside
-        className={`fixed left-0 top-0 h-full w-72 bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] ${sidebarCollapsed ? "lg:w-16 sidebar-collapsed" : "lg:w-64"} w-64 bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto transition-[width,transform] duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -517,14 +541,23 @@ export function Portfolio() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
               </span>
-              <span className="font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
-                MODEL CARD
+              <span className="sidebar-collapsible font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
+                Sourabh-Kumar04
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-label-telemetry text-[10px] text-primary/80 border border-primary/30 px-1.5 py-0.5 rounded-[2px] bg-primary/5">
-                AWS AIML Scholar'24
+                <span className="sidebar-collapsible">AWS AIML Scholar'24</span>
               </span>
+              <button
+                type="button"
+                className="hidden lg:flex text-on-surface-variant hover:text-primary cursor-pointer"
+                onClick={() => setSidebarCollapsed((previous) => !previous)}
+                aria-label={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
+                title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
+              >
+                {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              </button>
               <button
                 type="button"
                 className="lg:hidden text-on-surface-variant hover:text-white cursor-pointer"
@@ -557,12 +590,14 @@ export function Portfolio() {
                     >
                       [{index}]
                     </span>
-                    <span>{label}</span>
+                    <span className="sidebar-collapsible">{label}</span>
                   </div>
                   {isActive ? (
                     <ArrowRight size={14} className="text-primary" />
                   ) : (
-                    <span className="text-[10px] text-on-surface-variant font-mono">{meta}</span>
+                    <span className="sidebar-collapsible text-[10px] text-on-surface-variant font-mono">
+                      {meta}
+                    </span>
                   )}
                 </a>
               );
@@ -571,7 +606,9 @@ export function Portfolio() {
         </div>
 
         {/* Portfolio snapshot */}
-        <div className="mx-3 p-3 rounded-[3px] bg-[#0d1219]/90 border border-[#222c3d] flex flex-col gap-2.5">
+        <div
+          className={`${sidebarCollapsed ? "hidden" : ""} mx-3 p-3 rounded-[3px] bg-[#0d1219]/90 border border-[#222c3d] flex flex-col gap-2.5`}
+        >
           <div className="flex items-center justify-between border-b border-[#1b2433] pb-1.5">
             <span className="font-label-telemetry text-[10px] text-on-surface-variant uppercase flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -609,9 +646,11 @@ export function Portfolio() {
       </aside>
 
       {/* MAIN VIEWPORT CONTAINER */}
-      <div className="pl-0 lg:pl-72 relative z-20">
+      <div className={`relative z-20 ${sidebarCollapsed ? "lg:pl-16" : "lg:pl-64"}`}>
         {/* TOP MISSION CONTROL HUD */}
-        <header className="fixed top-0 left-0 lg:left-72 right-0 h-14 bg-[#090d13]/85 backdrop-blur-xl z-40 border-b border-[#1d2737] flex items-center justify-between px-4 lg:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.7)]">
+        <header
+          className={`fixed top-0 right-0 h-16 bg-[#090d13]/90 backdrop-blur-xl z-40 border-b border-[#1d2737] flex items-center justify-between px-4 lg:px-6 shadow-[0_4px_30px_rgba(0,0,0,0.7)] ${sidebarCollapsed ? "lg:left-16" : "lg:left-64"} left-0`}
+        >
           <div className="flex items-center gap-3 lg:gap-4 font-code-mono-sm text-code-mono-sm">
             {/* Mobile Menu Button */}
             <button
@@ -624,9 +663,14 @@ export function Portfolio() {
             </button>
 
             <div className="flex items-center gap-2 bg-[#121822] px-2.5 lg:px-3 py-1 rounded-[2px] border border-[#232e40]">
+              <img
+                src="/avatar.png"
+                alt="Sourabh Kumar"
+                className="w-5 h-5 rounded object-cover border border-primary/40"
+              />
               <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
               <span className="text-primary font-bold text-[10px] lg:text-[11px] tracking-wider uppercase">
-                MODEL CARD
+                Sourabh-Kumar04
               </span>
             </div>
 
@@ -643,7 +687,44 @@ export function Portfolio() {
             </button>
           </div>
 
+          <div className="hidden xl:flex items-center justify-center gap-2 flex-1 px-6 min-w-0">
+            <div className="dashboard-status-chip">
+              <span className="dashboard-status-dot" />
+              AVAILABLE FOR COLLABORATION · REACH OUT DIRECTLY
+            </div>
+            <div className="dashboard-stack-chip">
+              <span>STACK:</span> PyTorch · LangGraph · FastAPI · Qdrant · PEFT
+            </div>
+          </div>
+
           <div className="flex items-center gap-3 lg:gap-4 font-label-telemetry">
+            <div className="hidden sm:flex items-center gap-1.5">
+              <a
+                href="https://github.com/Sourabh-Kumar04"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="header-icon-link"
+                title="GitHub"
+              >
+                <Github size={14} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/sourabh-kumar04/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="header-icon-link"
+                title="LinkedIn"
+              >
+                <Linkedin size={14} />
+              </a>
+              <a
+                href="mailto:sourabhkumar01010101@gmail.com"
+                className="header-icon-link"
+                title="Email"
+              >
+                <Mail size={14} />
+              </a>
+            </div>
             {/* Scroll Telemetry Depth Gauge */}
             <div className="hidden lg:flex items-center gap-1.5 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] font-mono text-[10px] text-cyan-spec">
               <span className="text-on-surface-variant text-[9px] font-medium">DEPTH</span>
@@ -675,7 +756,7 @@ export function Portfolio() {
                 <span>LINKEDIN PROFILE</span>
               </a>
               <a
-                href="#maintainer"
+                href="#contact-terminal"
                 className="hidden sm:inline-flex bg-cyan-spec/10 border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec hover:text-black px-2 py-1 rounded-[2px] text-[10px] font-bold transition-all items-center gap-1 cursor-pointer"
               >
                 <span>CONTACT</span>
@@ -699,7 +780,7 @@ export function Portfolio() {
         <main className="relative pt-20 w-full px-4 sm:px-6 lg:px-10 min-h-screen">
           <div className="flex flex-col w-full text-on-surface pb-24 max-w-7xl mx-auto space-y-12">
             {/* SECTION 00: MODEL OVERVIEW */}
-            <section className="relative pt-4 flex flex-col gap-6" id="overview">
+            <section className="relative pt-4 flex flex-col gap-6" id="model-overview">
               <div className="hud-panel p-3 rounded-[3px] flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-primary">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-label-telemetry text-on-surface-variant">
                   <span>
@@ -723,34 +804,34 @@ export function Portfolio() {
                     <div className="flex flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-code-mono-sm text-[9px] text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-[2px] uppercase font-bold tracking-wider">
-                          AWS AI/ML SCHOLAR '24 | CS STUDENT @ UNIVERSITY OF DELHI
+                          AWS AI/ML SCHOLAR '24 · COMPUTER SCIENCE @ DELHI
                         </span>
                         <span className="font-code-mono-sm text-[8.5px] text-tertiary border border-tertiary/30 px-2 py-0.5 rounded-[2px] bg-tertiary/5 font-semibold">
                           OPEN TO AI/ML INTERNSHIPS
                         </span>
                       </div>
                       <p className="model-greeting" aria-label="Hello, I am Sourabh Kumar">
-                        <span>HELLO, I’M</span>
-                        <span className="text-primary"> SOURABH KUMAR</span>
+                        <span>HELLO — I’M</span>
+                        <span className="text-primary"> SOURABH</span>
                       </p>
                       <h1 className="hero-title-reveal font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
                         Sourabh Kumar
                       </h1>
                       <p className="hero-role-reveal font-code-mono-sm text-xs sm:text-sm text-primary font-medium tracking-wider uppercase pt-1">
-                        Applied LLM Engineer // Agentic Systems &amp; PEFT Fine-Tuning
+                        LLM / AGENT SYSTEMS ENGINEER // PEFT · RAG
                       </p>
                       <p className="font-body-md text-on-surface-variant flex items-center gap-1.5 pt-0.5 font-mono text-[11.5px]">
                         <GraduationCap size={14} className="text-primary shrink-0" />
-                        B.Sc. (Hons) Computer Science, University of Delhi (2023–2027)
+                        COMPUTER SCIENCE · UNIVERSITY OF DELHI · 2023–2027
                       </p>
                     </div>
 
                     <div className="bg-[#0e141e]/90 p-4 rounded-[3px] border-l-2 border-primary border-[#212c3d]">
                       <p className="font-body-lg text-on-surface leading-relaxed text-[15px]">
-                        I build practical AI systems: retrieval pipelines, agent workflows, and
-                        efficient fine-tuning experiments. I am a Computer Science student at the
-                        University of Delhi, currently looking for AI/ML internships where I can
-                        turn research ideas into reliable software.
+                        I design and ship practical AI systems across retrieval, agent
+                        orchestration, and parameter-efficient fine-tuning. As a Computer Science
+                        student at the University of Delhi, I’m looking for an AI/ML internship
+                        where careful experiments become reliable software.
                       </p>
                     </div>
 
@@ -772,7 +853,7 @@ export function Portfolio() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <span>github ↗</span>
+                        <span>GITHUB ↗</span>
                       </a>
                       <a
                         className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
@@ -780,13 +861,13 @@ export function Portfolio() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <span>linkedin ↗</span>
+                        <span>LINKEDIN ↗</span>
                       </a>
                       <a
-                        href="#evaluation"
+                        href="#evaluation-set"
                         className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                       >
-                        <span>view projects ↗</span>
+                        <span>VIEW EVALUATIONS ↗</span>
                       </a>
                     </div>
                   </div>
@@ -795,7 +876,7 @@ export function Portfolio() {
                   <div className="lg:col-span-4 bg-[#0a0d14]/90 border border-[#222c3d] p-4 rounded-[3px] flex flex-col gap-3">
                     <div className="flex items-center justify-between border-b border-[#1b2331] pb-1.5">
                       <span className="px-2 py-0.5 rounded-[2px] bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold">
-                        MODEL ATTENTION MAP
+                        ATTENTION DEMO / PORTFOLIO
                       </span>
                       <button
                         type="button"
@@ -808,58 +889,72 @@ export function Portfolio() {
                           size={11}
                           className={isRecomputing ? "animate-spin text-primary" : ""}
                         />
-                        <span>{isRecomputing ? "..." : "RERUN DEMO"}</span>
+                        <span>{isRecomputing ? "..." : "REPLAY DEMO"}</span>
                       </button>
                     </div>
 
                     <>
                       {/* Interactive 48-cell demo grid */}
                       <p className="text-[10px] text-on-surface-variant leading-relaxed">
-                        Demo visualization: simulated attention weights for an 8-head transformer.
-                        This is not a live model output.
+                        Illustrative attention demo across eight transformer heads. Values are
+                        simulated for this portfolio and do not represent live model inference.
                       </p>
-                      <div
-                        role="grid"
-                        aria-label="Simulated transformer attention weight demo"
-                        className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
-                      >
-                        {attentionWeights.map((w, idx) => {
-                          const isHovered = hoveredCell?.index === idx;
-                          const opacity = Math.max(0.12, w);
-                          return (
-                            <div
-                              key={idx}
-                              role="gridcell"
-                              tabIndex={0}
-                              aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
-                              onFocus={() => {
-                                setHoveredCell({ index: idx, weight: w });
-                              }}
-                              onBlur={() => setHoveredCell(null)}
-                              onMouseEnter={() => {
-                                setHoveredCell({ index: idx, weight: w });
-                              }}
-                              onMouseLeave={() => setHoveredCell(null)}
-                              onClick={() => {
-                                setAttentionWeights((prev) => {
-                                  const next = [...prev];
-                                  next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
-                                  return next;
-                                });
-                              }}
-                              className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${`${isRecomputing ? "cell-recomputing" : ""} ${
-                                attentionPulseIndex === idx ? "attention-active" : ""
-                              }`}`}
-                              style={{
-                                backgroundColor: idx === 47 ? "var(--tertiary)" : "var(--primary)",
-                                opacity: isHovered ? 1 : opacity,
-                                transform: isHovered ? "scale(1.35)" : "scale(1)",
-                                zIndex: isHovered ? 10 : 1,
-                                animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
-                              }}
-                            />
-                          );
-                        })}
+                      <div className="attention-labeled-grid">
+                        <div className="attention-axis-corner">Q / K</div>
+                        <div className="attention-column-labels">
+                          {Array.from({ length: 8 }, (_, index) => (
+                            <span key={index}>K{index + 1}</span>
+                          ))}
+                        </div>
+                        <div className="attention-row-labels">
+                          {Array.from({ length: 6 }, (_, index) => (
+                            <span key={index}>Q{index + 1}</span>
+                          ))}
+                        </div>
+                        <div
+                          role="grid"
+                          aria-label="Simulated transformer attention weight demo"
+                          className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
+                        >
+                          {attentionWeights.map((w, idx) => {
+                            const isHovered = hoveredCell?.index === idx;
+                            const opacity = Math.max(0.12, w);
+                            return (
+                              <div
+                                key={idx}
+                                role="gridcell"
+                                tabIndex={0}
+                                aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
+                                onFocus={() => {
+                                  setHoveredCell({ index: idx, weight: w });
+                                }}
+                                onBlur={() => setHoveredCell(null)}
+                                onMouseEnter={() => {
+                                  setHoveredCell({ index: idx, weight: w });
+                                }}
+                                onMouseLeave={() => setHoveredCell(null)}
+                                onClick={() => {
+                                  setAttentionWeights((prev) => {
+                                    const next = [...prev];
+                                    next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
+                                    return next;
+                                  });
+                                }}
+                                className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${`${isRecomputing ? "cell-recomputing" : ""} ${
+                                  attentionPulseIndex === idx ? "attention-active" : ""
+                                }`}`}
+                                style={{
+                                  backgroundColor:
+                                    idx === 47 ? "var(--tertiary)" : "var(--primary)",
+                                  opacity: isHovered ? 1 : opacity,
+                                  transform: isHovered ? "scale(1.35)" : "scale(1)",
+                                  zIndex: isHovered ? 10 : 1,
+                                  animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
                       </div>
 
                       {/* Dynamic readout */}
@@ -871,17 +966,17 @@ export function Portfolio() {
                           </span>
                         ) : (
                           <span className="text-cyan-spec font-medium">
-                            Σ_j α_ij = 1.000 · ROW-STOCHASTIC
+                            ROW NORMALIZED · SIMULATED WEIGHTS
                           </span>
                         )}
-                        <span className="text-tertiary">CONVERGED</span>
+                        <span className="text-tertiary">DEMO READY</span>
                       </div>
                       <div
                         className="depth-meter"
                         aria-label={`Page depth ${scrollPercent.toFixed(0)} percent`}
                       >
                         <div className="flex items-center justify-between font-label-telemetry text-[9px] text-on-surface-variant">
-                          <span>MODEL CARD DEPTH</span>
+                          <span>PAGE DEPTH</span>
                           <span className="text-primary tabular-nums">
                             {scrollPercent.toFixed(0)}%
                           </span>
@@ -902,12 +997,12 @@ export function Portfolio() {
                     </span>
                     <span className="text-tertiary font-semibold flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse" />
-                      OPEN TO INTERNSHIPS
+                      OPEN TO AI/ML INTERNSHIPS
                     </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-on-surface-variant uppercase font-medium">
-                      PRIMARY STACK
+                      CORE STACK
                     </span>
                     <span className="text-white font-semibold">PyTorch • FastAPI</span>
                   </div>
@@ -986,7 +1081,7 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 01: OPERATOR PROFILE */}
-            <section className="relative py-4 flex flex-col gap-6" id="model-details">
+            <section className="relative py-4 flex flex-col gap-6" id="operator-profile">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[01]</span>
@@ -1048,7 +1143,7 @@ export function Portfolio() {
                     <div className="text-on-surface-variant">
                       GEO:{" "}
                       <span className="text-white font-medium">
-                        New Delhi, IN (28.61°N, 77.20°E)
+                        New Delhi, IN · 28.61°N, 77.20°E
                       </span>
                     </div>
                   </div>
@@ -1059,7 +1154,7 @@ export function Portfolio() {
                   <div>
                     <div className="flex items-center justify-between border-b border-[#1c2432] pb-2 mb-2">
                       <span className="font-label-telemetry text-[11px] text-primary uppercase font-bold tracking-wider">
-                        MODEL CARD SPECIFICATION
+                        SOURABH-KUMAR04 // PROFILE SPECIFICATION
                       </span>
                       <span className="font-code-mono-sm text-[10px] text-tertiary">
                         CALIBRATED // VERIFIED
@@ -1113,7 +1208,7 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 02: TRAINING RECORD */}
-            <section className="relative py-4 flex flex-col gap-6" id="training-data">
+            <section className="relative py-4 flex flex-col gap-6" id="training-record">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[02]</span>
@@ -1202,7 +1297,7 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 03: EVALUATION SET */}
-            <section className="relative py-4 flex flex-col gap-6" id="evaluation">
+            <section className="relative py-4 flex flex-col gap-6" id="evaluation-set">
               <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[03]</span>
@@ -1229,21 +1324,17 @@ export function Portfolio() {
                 </div>
               </div>
 
-              <p className="max-w-3xl text-sm leading-relaxed text-on-surface-variant">
-                A small set of projects that show how I approach data, model behavior, and
-                deployment—from retrieval and recommendation systems to multi-agent fine-tuning.
-                Each card highlights the engineering path and the evidence behind the result.
-              </p>
+              <p className="max-w-3xl text-sm leading-relaxed text-on-surface-variant"></p>
 
               <div className="flex flex-col gap-6">
-                {filteredProjects.map((p) => (
-                  <TiltProjectCard key={p.title} project={p} />
+                {filteredProjects.map((p, index) => (
+                  <TiltProjectCard key={p.title} project={p} index={index + 1} />
                 ))}
               </div>
             </section>
 
             {/* SECTION 04: RESEARCH NOTES */}
-            <section className="relative py-4 flex flex-col gap-6" id="learning-repos">
+            <section className="relative py-4 flex flex-col gap-6" id="research-notes">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[04]</span>
@@ -1305,7 +1396,7 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 05: CAPABILITY SCHEMA */}
-            <section className="relative py-4 flex flex-col gap-6" id="capabilities">
+            <section className="relative py-4 flex flex-col gap-6" id="capability-schema">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[05]</span>
@@ -1399,7 +1490,7 @@ export function Portfolio() {
             </section>
 
             {/* SECTION 08: MAINTAINER CONTACT */}
-            <section className="relative py-4 flex flex-col gap-6" id="maintainer">
+            <section className="relative py-4 flex flex-col gap-6" id="contact-terminal">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[08]</span>

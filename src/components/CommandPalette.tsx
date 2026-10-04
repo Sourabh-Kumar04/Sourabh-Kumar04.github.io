@@ -38,37 +38,37 @@ interface CommandPaletteProps {
 
 const SECTION_ITEMS = [
   {
-    id: "overview",
+    id: "model-overview",
     label: "[00] MODEL_OVERVIEW",
     icon: Terminal,
     desc: "Introduction, featured projects, and interactive AI visual",
   },
   {
-    id: "model-details",
+    id: "operator-profile",
     label: "[01] OPERATOR_PROFILE",
     icon: Layers,
     desc: "Background, focus areas, and engineering trajectory",
   },
   {
-    id: "training-data",
+    id: "training-record",
     label: "[02] TRAINING_RECORD",
     icon: GraduationCap,
     desc: "University of Delhi and selected certifications",
   },
   {
-    id: "evaluation",
+    id: "evaluation-set",
     label: "[03] EVALUATION_SET",
     icon: Briefcase,
     desc: "RasoSynthTune, Raso Medical Chatbot, Movie Recommendation System",
   },
   {
-    id: "learning-repos",
+    id: "research-notes",
     label: "[04] RESEARCH_NOTES",
     icon: BookOpen,
     desc: "Selected learning repositories and technical references",
   },
   {
-    id: "capabilities",
+    id: "capability-schema",
     label: "[05] CAPABILITY_SCHEMA",
     icon: Code2,
     desc: "Skill matrix (PyTorch, LangGraph, LoRA/PEFT)",
@@ -86,7 +86,7 @@ const SECTION_ITEMS = [
     desc: "Zero-ego calibration and growth areas",
   },
   {
-    id: "maintainer",
+    id: "contact-terminal",
     label: "[08] MAINTAINER_CONTACT",
     icon: Mail,
     desc: "Contact form and professional links",
@@ -173,7 +173,7 @@ export function CommandPalette({
         <CommandGroup heading="QUICK ACTIONS">
           <CommandItem
             onSelect={() => {
-              handleJump("maintainer");
+              handleJump("contact-terminal");
             }}
             className="flex items-center justify-between py-2.5 px-3 cursor-pointer hover:bg-primary/10"
           >
@@ -181,7 +181,7 @@ export function CommandPalette({
               <Mail size={14} className="text-on-surface-variant" />
               <span>Dispatch Inference Message</span>
             </div>
-            <code className="text-[10px] text-primary">#maintainer</code>
+            <code className="text-[10px] text-primary">#contact-terminal</code>
           </CommandItem>
 
           <CommandItem
