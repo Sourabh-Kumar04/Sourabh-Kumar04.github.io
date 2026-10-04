@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { Sparkles, Rotate3d, Zap, Layers } from "lucide-react";
-import { audioTelemetry } from "../lib/audio-telemetry";
 
 export function Interactive3DCore() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -322,7 +321,6 @@ export function Interactive3DCore() {
   }, [wireframeOnly]);
 
   const triggerCorePulse = () => {
-    audioTelemetry.playPing();
     isPulseActiveRef.current = true;
   };
 
@@ -340,7 +338,6 @@ export function Interactive3DCore() {
           <button
             type="button"
             onClick={() => {
-              audioTelemetry.playClick();
               setWireframeOnly((prev) => !prev);
             }}
             className={`px-1.5 py-0.5 rounded-[2px] border text-[9.5px] transition-colors flex items-center gap-1 cursor-pointer ${

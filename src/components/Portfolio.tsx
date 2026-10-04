@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { CommandPalette } from "./CommandPalette";
-import { InteractiveTerminal } from "./InteractiveTerminal";
-import { SpecModal } from "./SpecModal";
-import { TelemetryClock } from "./TelemetryClock";
-import { CyberBackgroundCanvas } from "./CyberBackgroundCanvas";
 import { Interactive3DCore } from "./Interactive3DCore";
 import { Toaster } from "./ui/sonner";
-import { audioTelemetry } from "../lib/audio-telemetry";
 import {
-  Terminal as TerminalIcon,
-  Volume2,
-  VolumeX,
   FileText,
   Code2,
   Cpu,
@@ -26,7 +18,6 @@ import {
   X,
   ArrowRight,
   Menu,
-  Clock,
   Brain,
   GraduationCap,
   FolderGit2,
@@ -47,13 +38,13 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { index: "00", id: "overview", label: "OVERVIEW", meta: "HERO" },
-  { index: "01", id: "model-details", label: "MODEL_DETAILS", meta: "PROFILE" },
-  { index: "02", id: "training-data", label: "TRAINING_DATA", meta: "5" },
-  { index: "03", id: "evaluation", label: "EVALUATION", meta: "3" },
-  { index: "04", id: "learning-repos", label: "LEARNING_REPOS", meta: "7" },
-  { index: "05", id: "capabilities", label: "CAPABILITIES", meta: "STACK" },
-  { index: "06", id: "external-validation", label: "EXTERNAL_VALIDATION", meta: "MERGED" },
-  { index: "07", id: "limitations", label: "LIMITATIONS", meta: "ZERO-EGO" },
+  { index: "01", id: "model-details", label: "ABOUT_ME", meta: "PROFILE" },
+  { index: "02", id: "training-data", label: "EDUCATION", meta: "5" },
+  { index: "03", id: "evaluation", label: "SELECTED_WORK", meta: "3" },
+  { index: "04", id: "learning-repos", label: "TECHNICAL_NOTES", meta: "4" },
+  { index: "05", id: "capabilities", label: "SKILLS", meta: "STACK" },
+  { index: "06", id: "external-validation", label: "OPEN_SOURCE", meta: "MERGED" },
+  { index: "07", id: "limitations", label: "GROWTH_AREAS", meta: "HONEST" },
   { index: "08", id: "maintainer", label: "CONTACT", meta: "PING" },
 ];
 
@@ -64,6 +55,8 @@ interface Project {
   tagColor: string;
   stack: string;
   description: string;
+  outcome: string;
+  architecture: string;
   links: { label: string; href: string }[];
   borderAccent: string;
 }
@@ -77,6 +70,8 @@ const PROJECTS: Project[] = [
     stack: "FastAPI · LangGraph · LoRA/PEFT · Docker · Redis · PostgreSQL · Qdrant",
     description:
       "End-to-end multi-agent pipeline discovering, filtering, and synthesizing domain datasets with automated quality gating (>85% score retention) and human-in-the-loop review. Implements 4-bit QLoRA fine-tuning across all 7 linear projections on Llama-3-8B and Mistral-7B, yielding 41.9M trainable params (0.519%) on single consumer GPUs.",
+    outcome: "0.519% trainable parameters · >85% quality gate · human review before training",
+    architecture: "Dataset discovery → quality scoring → human approval → QLoRA training",
     links: [
       { label: "view repository ↗", href: "https://github.com/Sourabh-Kumar04/RasoSynth_CUTC" },
     ],
@@ -90,6 +85,8 @@ const PROJECTS: Project[] = [
     stack: "RAG · Llama 2 · Flask",
     description:
       "A retrieval-augmented chatbot answering health questions from a full medical encyclopedia rather than relying on memory. Currently being redeployed after a configuration change.",
+    outcome: "Grounded responses from a domain knowledge base · redeployment in progress",
+    architecture: "Question → retrieval → context assembly → Llama 2 response",
     links: [
       {
         label: "view project ↗",
@@ -106,6 +103,8 @@ const PROJECTS: Project[] = [
     stack: "Python · pandas · scikit-learn",
     description:
       "A content-based recommender scoring films by genre, rating and similarity to suggest what to watch next.",
+    outcome: "Content-based recommendations over the TMDB 5000 dataset",
+    architecture: "Movie metadata → feature representation → cosine similarity → ranked results",
     links: [
       {
         label: "view repository ↗",
@@ -125,7 +124,7 @@ interface LearningRepo {
   topics: string[];
 }
 
-const LEARNING_REPOS: LearningRepo[] = [
+const TECHNICAL_NOTES: LearningRepo[] = [
   {
     title: "LangChain",
     topic: "AGENTS & RETRIEVAL",
@@ -144,24 +143,6 @@ const LEARNING_REPOS: LearningRepo[] = [
     topics: ["StateGraph", "Multi-Agent", "HITL", "Persistence"],
   },
   {
-    title: "NumPy-Basic",
-    topic: "FOUNDATIONAL NUMERICS",
-    tagColor: "bg-tertiary/10 text-tertiary border-tertiary/30",
-    description:
-      "A phased, from-scratch series on NumPy fundamentals, vectorization, and matrix manipulation.",
-    href: "https://github.com/Sourabh-Kumar04/Numpy-Basic",
-    topics: ["Vectorization", "Broadcasting", "Linear Algebra", "Tensor Operations"],
-  },
-  {
-    title: "FastAPI",
-    topic: "BACKEND & ML SERVING",
-    tagColor: "bg-primary/10 text-primary border-primary/30",
-    description:
-      "Asynchronous APIs, dependency injection, streaming endpoints, and production ML model serving.",
-    href: "https://github.com/Sourabh-Kumar04/FastAPI",
-    topics: ["Async", "ML Serving", "Dependency Injection", "Streaming"],
-  },
-  {
     title: "PyTorch",
     topic: "DEEP LEARNING CORE",
     tagColor: "bg-cyan-spec/10 text-cyan-spec border-cyan-spec/30",
@@ -178,15 +159,6 @@ const LEARNING_REPOS: LearningRepo[] = [
       "Production LLM tracing, run debugging, latency profiling, dataset creation, and evaluation runs.",
     href: "https://github.com/Sourabh-Kumar04/LangSmith_Masterclass",
     topics: ["Tracing", "Debugging", "Evals", "Prompt Monitoring"],
-  },
-  {
-    title: "Pydantic-Basic",
-    topic: "SCHEMA & TYPE ENFORCEMENT",
-    tagColor: "bg-primary/10 text-primary border-primary/30",
-    description:
-      "Data validation, schema enforcement, custom field validators, and type safety for LLM pipelines.",
-    href: "https://github.com/Sourabh-Kumar04/Pydantic-Basic",
-    topics: ["BaseModel", "Validation", "Field Validators", "Type Safety"],
   },
 ];
 
@@ -445,6 +417,20 @@ function TiltProjectCard({ project }: { project: Project }) {
       <p className="font-body-md text-on-surface-variant text-[14px] relative z-10 leading-relaxed">
         {project.description}
       </p>
+      <div className="grid gap-3 sm:grid-cols-2 relative z-10 border-t border-[#1b2535] pt-3">
+        <div>
+          <span className="block text-[10px] uppercase tracking-wider text-primary font-bold mb-1">
+            outcome
+          </span>
+          <span className="text-[12px] text-white/90 leading-relaxed">{project.outcome}</span>
+        </div>
+        <div>
+          <span className="block text-[10px] uppercase tracking-wider text-cyan-spec font-bold mb-1">
+            architecture
+          </span>
+          <span className="text-[12px] text-white/90 leading-relaxed">{project.architecture}</span>
+        </div>
+      </div>
       <div className="flex flex-wrap gap-4 font-mono text-xs pt-1 relative z-10">
         {project.links.map((link) => (
           <a
@@ -466,10 +452,7 @@ export function Portfolio() {
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [terminalOpen, setTerminalOpen] = useState(false);
-  const [specModalOpen, setSpecModalOpen] = useState(false);
   const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
   const [evaluationTab, setEvaluationTab] = useState<"projects" | "code">("projects");
   const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
@@ -517,10 +500,9 @@ export function Portfolio() {
       });
 
       if (response.ok) {
-        audioTelemetry.playSuccess();
         setFormStatus("success");
         form.reset();
-        toast.success("Inference Ping Dispatched!", {
+        toast.success("Message sent", {
           description: "Payload delivered securely to Sourabh Kumar.",
         });
         return;
@@ -532,53 +514,11 @@ export function Portfolio() {
     }
 
     // Acknowledge payload dispatch locally
-    audioTelemetry.playSuccess();
     setFormStatus("success");
     form.reset();
-    toast.success("Inference Ping Logged", {
+    toast.success("Message received", {
       description: "Payload delivered. You can also connect directly via LinkedIn or GitHub.",
     });
-  };
-
-  // Initialize audio state
-  useEffect(() => {
-    setAudioEnabled(audioTelemetry.isEnabled());
-  }, []);
-
-  const toggleAudio = () => {
-    const nextState = audioTelemetry.toggle();
-    setAudioEnabled(nextState);
-    if (nextState) {
-      toast.success("Cyberpunk Audio Telemetry Active", {
-        description: "Web Audio procedural synthesizers enabled.",
-      });
-    } else {
-      toast.info("Audio Telemetry Muted");
-    }
-  };
-
-  // Keyboard shortcut listeners (Cmd+K for Palette, ~ or ` for Terminal)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === "`" || e.key === "~") && !e.metaKey && !e.ctrlKey) {
-        // Do not intercept if actively typing in an input or textarea
-        const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
-        if (tag === "input" || tag === "textarea") return;
-        e.preventDefault();
-        audioTelemetry.playBeep();
-        setTerminalOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // Global click audio
-  const handleGlobalClick = (e: React.MouseEvent) => {
-    const isInteractive = (e.target as HTMLElement)?.closest("button, a, input, textarea, select");
-    if (!isInteractive) {
-      audioTelemetry.playClick();
-    }
   };
 
   // Track active section on scroll
@@ -606,7 +546,6 @@ export function Portfolio() {
 
   // Re-generate attention weights using true row-stochastic Softmax distribution
   const recomputeAttention = () => {
-    audioTelemetry.playPing();
     setIsRecomputing(true);
     const newWeights = computeSoftmaxAttention(false);
     setAttentionWeights(newWeights);
@@ -618,12 +557,11 @@ export function Portfolio() {
 
   // Copy active code snippet
   const handleCopySnippet = async (code: string) => {
-    audioTelemetry.playClick();
     try {
       if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
       await navigator.clipboard.writeText(code);
       setCopiedSnippet(true);
-      toast.success("Code Telemetry Copied", { description: "Snippet saved to clipboard." });
+      toast.success("Code copied", { description: "Snippet saved to clipboard." });
       window.setTimeout(() => setCopiedSnippet(false), 2000);
     } catch {
       toast.error("Copy failed", { description: "Clipboard access is unavailable." });
@@ -642,10 +580,7 @@ export function Portfolio() {
   );
 
   return (
-    <div
-      onClick={handleGlobalClick}
-      className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero"
-    >
+    <div className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
       <Toaster position="bottom-right" theme="dark" richColors />
 
       {/* VIEWPORT SCROLL PROGRESS TELEMETRY BAR */}
@@ -660,24 +595,7 @@ export function Portfolio() {
         onOpenChange={setCommandOpen}
         toggleScanlines={() => setScanlinesEnabled((prev) => !prev)}
         scanlinesEnabled={scanlinesEnabled}
-        onOpenTerminal={() => setTerminalOpen(true)}
-        onOpenSpecModal={() => setSpecModalOpen(true)}
-        onToggleAudio={toggleAudio}
-        audioEnabled={audioEnabled}
       />
-
-      {/* INTERACTIVE TELEMETRY SHELL MODAL */}
-      <InteractiveTerminal
-        open={terminalOpen}
-        onClose={() => setTerminalOpen(false)}
-        onRecomputeAttention={recomputeAttention}
-      />
-
-      {/* CURRICULUM VITAE SPEC MODAL */}
-      <SpecModal open={specModalOpen} onClose={() => setSpecModalOpen(false)} />
-
-      {/* 3D WEBGL CYBERNETIC BACKGROUND SCENE */}
-      <CyberBackgroundCanvas />
 
       {/* CRT SCANLINES & HIGH-FREQUENCY LATTICE OVERLAYS */}
       {scanlinesEnabled && (
@@ -740,10 +658,7 @@ export function Portfolio() {
                 <a
                   key={id}
                   href={`#${id}`}
-                  onClick={() => {
-                    audioTelemetry.playClick();
-                    setSidebarOpen(false);
-                  }}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center justify-between px-3 py-2 rounded-[2px] transition-all border-l-2 ${
                     isActive
                       ? "bg-[#161f2e] text-primary border-primary shadow-[0_0_10px_rgba(236,194,70,0.2)] font-medium"
@@ -751,7 +666,9 @@ export function Portfolio() {
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className={isActive ? "text-primary font-bold" : "text-primary/70"}>
+                    <span
+                      className={isActive ? "text-primary font-bold" : "text-primary font-medium"}
+                    >
                       [{index}]
                     </span>
                     <span>{label}</span>
@@ -759,51 +676,20 @@ export function Portfolio() {
                   {isActive ? (
                     <ArrowRight size={14} className="text-primary" />
                   ) : (
-                    <span className="text-[10px] opacity-40">{meta}</span>
+                    <span className="text-[10px] text-on-surface-variant font-mono">{meta}</span>
                   )}
                 </a>
               );
             })}
           </nav>
-
-          {/* Quick Action Badges */}
-          <div className="px-3 pt-1 space-y-1.5 font-mono text-[11px]">
-            <button
-              onClick={() => {
-                audioTelemetry.playBeep();
-                setTerminalOpen(true);
-              }}
-              className="w-full flex items-center justify-between p-2 rounded-[2px] bg-[#0c121a] hover:bg-primary/10 border border-[#1e2736] hover:border-primary/40 text-on-surface hover:text-primary transition-all text-left cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <TerminalIcon size={12} className="text-primary" />
-                <span>SHELL CONSOLE</span>
-              </span>
-              <kbd className="text-[9px] bg-[#1a2332] px-1 py-0.2 rounded text-primary">~</kbd>
-            </button>
-
-            <button
-              onClick={() => {
-                audioTelemetry.playClick();
-                setSpecModalOpen(true);
-              }}
-              className="w-full flex items-center justify-between p-2 rounded-[2px] bg-[#0c121a] hover:bg-cyan-spec/10 border border-[#1e2736] hover:border-cyan-spec/40 text-on-surface hover:text-cyan-spec transition-all text-left cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5">
-                <FileText size={12} className="text-cyan-spec" />
-                <span>CURRICULUM SPEC</span>
-              </span>
-              <span className="text-[9px] text-cyan-spec font-bold">PDF</span>
-            </button>
-          </div>
         </div>
 
-        {/* Live Telemetry Monitor Box in Sidebar */}
+        {/* Portfolio snapshot */}
         <div className="mx-3 p-3 rounded-[3px] bg-[#0d1219]/90 border border-[#222c3d] flex flex-col gap-2.5">
           <div className="flex items-center justify-between border-b border-[#1b2433] pb-1.5">
             <span className="font-label-telemetry text-[10px] text-on-surface-variant uppercase flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              SYSTEM TELEMETRY
+              PORTFOLIO SNAPSHOT
             </span>
             <span className="font-code-mono-sm text-[10px] text-tertiary font-bold tracking-wider">
               VERIFIED
@@ -823,12 +709,12 @@ export function Portfolio() {
               <span className="text-tertiary font-bold">SwarmLLM #48</span>
             </div>
             <div className="flex justify-between text-[10px]">
-              <span>NODE STATUS</span>
-              <span className="text-primary font-bold">SK-04 // ACTIVE</span>
+              <span>FOCUS</span>
+              <span className="text-primary font-bold">AI SYSTEMS</span>
             </div>
             <div className="flex justify-between text-[10px] pt-0.5 border-t border-[#1b2433]">
               <span>SCROLL DEPTH</span>
-              <span className="text-cyan-spec font-mono font-bold">
+              <span className="text-cyan-spec font-mono font-bold tabular-nums">
                 {scrollPercent.toFixed(0).padStart(3, "0")}%
               </span>
             </div>
@@ -858,21 +744,6 @@ export function Portfolio() {
               </span>
             </div>
 
-            {/* Terminal Shell Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                audioTelemetry.playBeep();
-                setTerminalOpen(true);
-              }}
-              className="hidden sm:inline-flex items-center gap-1.5 bg-[#121822] hover:bg-[#192230] text-on-surface-variant hover:text-primary px-2.5 py-1 rounded-[2px] border border-[#232e40] transition-colors text-[10px] cursor-pointer"
-              title="Open Terminal Shell (Press ~)"
-            >
-              <TerminalIcon size={12} className="text-primary" />
-              <span>SHELL</span>
-              <kbd className="bg-[#1e2736] px-1 py-0.2 rounded text-[9px] text-primary">~</kbd>
-            </button>
-
             {/* Command Palette Trigger */}
             <button
               type="button"
@@ -880,43 +751,19 @@ export function Portfolio() {
               className="hidden md:inline-flex items-center gap-1.5 bg-[#121822] hover:bg-[#192230] text-on-surface-variant hover:text-primary px-2.5 py-1 rounded-[2px] border border-[#232e40] transition-colors text-[10px] cursor-pointer"
               title="Open Terminal Palette (Cmd+K)"
             >
-              <TerminalIcon size={12} className="text-primary" />
+              <Brain size={12} className="text-primary" />
               <span>CMD</span>
               <kbd className="bg-[#1e2736] px-1 py-0.2 rounded text-[9px] text-primary">⌘K</kbd>
             </button>
           </div>
 
           <div className="flex items-center gap-3 lg:gap-4 font-label-telemetry">
-            {/* Audio Telemetry Toggle */}
-            <button
-              type="button"
-              onClick={toggleAudio}
-              className="inline-flex items-center gap-1.5 text-[10px] text-on-surface-variant hover:text-primary transition-colors bg-[#121822] px-2 py-1 rounded-[2px] border border-[#232e40] cursor-pointer"
-              title="Toggle procedural UI audio effects"
-            >
-              {audioEnabled ? (
-                <>
-                  <Volume2 size={12} className="text-tertiary" />
-                  <span className="text-tertiary font-bold hidden sm:inline">AUDIO: ON</span>
-                  <span className="flex items-center gap-0.5 h-3 ml-0.5" aria-hidden="true">
-                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-1" />
-                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-2" />
-                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-3" />
-                    <span className="w-0.5 bg-tertiary rounded-full equalizer-bar-4" />
-                  </span>
-                </>
-              ) : (
-                <>
-                  <VolumeX size={12} className="text-on-surface-variant" />
-                  <span className="hidden sm:inline">MUTE</span>
-                </>
-              )}
-            </button>
-
             {/* Scroll Telemetry Depth Gauge */}
             <div className="hidden lg:flex items-center gap-1.5 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] font-mono text-[10px] text-cyan-spec">
-              <span className="text-on-surface-variant/70 text-[9px]">DEPTH</span>
-              <span className="font-bold">{scrollPercent.toFixed(0).padStart(3, "0")}%</span>
+              <span className="text-on-surface-variant text-[9px] font-medium">DEPTH</span>
+              <span className="font-bold tabular-nums">
+                {scrollPercent.toFixed(0).padStart(3, "0")}%
+              </span>
             </div>
 
             {/* Scanlines Toggle Button */}
@@ -930,33 +777,23 @@ export function Portfolio() {
               <span>CRT: {scanlinesEnabled ? "ON" : "OFF"}</span>
             </button>
 
-            {/* Sticky Recruiter Quick-Actions */}
+            {/* Sticky recruiter quick-actions */}
             <div className="flex items-center gap-1.5 font-mono">
-              <button
-                type="button"
-                onClick={() => {
-                  audioTelemetry.playClick();
-                  setSpecModalOpen(true);
-                }}
+              <a
+                href="https://www.linkedin.com/in/sourabh-kumar04/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-primary/10 border border-primary/40 text-primary hover:bg-primary hover:text-black px-2.5 py-1 rounded-[2px] text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer"
-                title="View printable Curriculum Vitae / Resume"
               >
                 <FileText size={11} />
-                <span>RESUME</span>
-              </button>
+                <span>LINKEDIN PROFILE</span>
+              </a>
               <a
                 href="#maintainer"
-                onClick={() => audioTelemetry.playClick()}
                 className="hidden sm:inline-flex bg-cyan-spec/10 border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec hover:text-black px-2 py-1 rounded-[2px] text-[10px] font-bold transition-all items-center gap-1 cursor-pointer"
               >
                 <span>CONTACT</span>
               </a>
-            </div>
-
-            {/* Precision Clock */}
-            <div className="hidden sm:flex items-center gap-2 bg-[#121822] px-2.5 py-1 rounded-[2px] border border-[#232e40] text-primary">
-              <Clock size={13} className="text-primary" />
-              <TelemetryClock className="tracking-widest font-mono text-[11px]" />
             </div>
 
             <div className="flex items-center gap-2 pl-2 border-l border-[#243042]">
@@ -993,7 +830,7 @@ export function Portfolio() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-[10px] bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded-[2px]">
-                    AVAILABLE / INFERENCE READY
+                    AVAILABLE FOR AI/ML WORK
                   </span>
                 </div>
               </div>
@@ -1025,27 +862,25 @@ export function Portfolio() {
 
                     <div className="bg-[#0e141e]/90 p-4 rounded-[3px] border-l-2 border-primary border-[#212c3d]">
                       <p className="font-body-lg text-on-surface leading-relaxed text-[15px]">
-                        Computer Science student at the University of Delhi, moving from classical
-                        machine learning toward agentic AI systems and applied LLM engineering —
-                        most recently a multi-agent dataset-synthesis platform, and a merged
-                        contribution to an open-source peer-to-peer inference engine.
+                        I build practical AI systems: retrieval pipelines, agent workflows, and
+                        efficient fine-tuning experiments. I am a Computer Science student at the
+                        University of Delhi, currently looking for AI/ML internships where I can
+                        turn research ideas into reliable software.
                       </p>
                     </div>
 
                     {/* Action Buttons: Optimized Recruiter Conversion & Provenance Hierarchy */}
                     <div className="flex flex-wrap items-center gap-3 pt-2 font-mono text-xs">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          audioTelemetry.playClick();
-                          setSpecModalOpen(true);
-                        }}
+                      <a
+                        href="https://www.linkedin.com/in/sourabh-kumar04/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="bg-primary text-black px-4 py-2 rounded-[2px] font-bold hover:bg-white transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_16px_rgba(236,194,70,0.35)]"
-                        title="Open full printable Curriculum Vitae / Resume Spec"
+                        title="Open LinkedIn profile and resume details"
                       >
                         <FileText size={13} />
                         <span>VIEW RESUME / CV SPEC ↗</span>
-                      </button>
+                      </a>
                       <a
                         className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                         href="https://github.com/Sourabh-Kumar04"
@@ -1064,22 +899,10 @@ export function Portfolio() {
                       </a>
                       <a
                         href="#evaluation"
-                        onClick={() => audioTelemetry.playClick()}
                         className="bg-[#121924] border border-cyan-spec/40 text-cyan-spec hover:bg-cyan-spec/10 px-3.5 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
                       >
                         <span>view projects ↗</span>
                       </a>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          audioTelemetry.playBeep();
-                          setTerminalOpen(true);
-                        }}
-                        className="bg-[#121924] border border-[#2e3b4f] text-on-surface-variant hover:text-primary px-3 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <TerminalIcon size={13} />
-                        <span>SHELL (~)</span>
-                      </button>
                     </div>
                   </div>
 
@@ -1090,7 +913,6 @@ export function Portfolio() {
                         <button
                           type="button"
                           onClick={() => {
-                            audioTelemetry.playClick();
                             setHeroWidgetTab("3d-core");
                           }}
                           className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
@@ -1104,7 +926,6 @@ export function Portfolio() {
                         <button
                           type="button"
                           onClick={() => {
-                            audioTelemetry.playClick();
                             setHeroWidgetTab("attention");
                           }}
                           className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
@@ -1129,7 +950,7 @@ export function Portfolio() {
                             size={11}
                             className={isRecomputing ? "animate-spin text-primary" : ""}
                           />
-                          <span>{isRecomputing ? "..." : "RE-ATTEND"}</span>
+                          <span>{isRecomputing ? "..." : "RERUN DEMO"}</span>
                         </button>
                       )}
                     </div>
@@ -1139,9 +960,13 @@ export function Portfolio() {
                     ) : (
                       <>
                         {/* Interactive 48-Cell Grid */}
+                        <p className="text-[10px] text-on-surface-variant leading-relaxed">
+                          Demo visualization: simulated attention weights for an 8-head transformer.
+                          This is not a live model output.
+                        </p>
                         <div
                           role="grid"
-                          aria-label="Transformer Attention Weight Matrix (48 simulated heads)"
+                          aria-label="Simulated transformer attention weight demo"
                           className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
                         >
                           {attentionWeights.map((w, idx) => {
@@ -1154,17 +979,14 @@ export function Portfolio() {
                                 tabIndex={0}
                                 aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
                                 onFocus={() => {
-                                  audioTelemetry.playClick();
                                   setHoveredCell({ index: idx, weight: w });
                                 }}
                                 onBlur={() => setHoveredCell(null)}
                                 onMouseEnter={() => {
-                                  audioTelemetry.playClick();
                                   setHoveredCell({ index: idx, weight: w });
                                 }}
                                 onMouseLeave={() => setHoveredCell(null)}
                                 onClick={() => {
-                                  audioTelemetry.playTone(380 + (idx % 8) * 45, "sine", 0.08);
                                   setAttentionWeights((prev) => {
                                     const next = [...prev];
                                     next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
@@ -1207,7 +1029,7 @@ export function Portfolio() {
                   </div>
                 </div>
 
-                {/* Bottom Live Telemetry Strip */}
+                {/* Bottom portfolio summary strip */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-[#0a0d13]/80 border-t border-[#20293a] mt-6 -mx-4 sm:-mx-6 lg:-mx-8 -mb-4 sm:-mb-6 lg:-mb-8 p-3 sm:p-4 font-code-mono-sm text-[12px]">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-on-surface-variant uppercase font-medium">
@@ -1229,12 +1051,6 @@ export function Portfolio() {
                       GEO
                     </span>
                     <span className="text-primary font-semibold">28.61°N, 77.20°E</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-on-surface-variant uppercase font-medium">
-                      LOCAL TIME
-                    </span>
-                    <TelemetryClock className="text-cyan-spec font-semibold" />
                   </div>
                 </div>
               </div>
@@ -1304,13 +1120,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 01: MODEL_DETAILS */}
+            {/* SECTION 01: ABOUT ME */}
             <section className="relative py-4 flex flex-col gap-6" id="model-details">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[01]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    model_details
+                    about me
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1431,13 +1247,13 @@ export function Portfolio() {
               </div>
             </section>
 
-            {/* SECTION 02: TRAINING_DATA */}
+            {/* SECTION 02: EDUCATION */}
             <section className="relative py-4 flex flex-col gap-6" id="training-data">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[02]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    training_data
+                    education
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1526,7 +1342,7 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[03]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    evaluation
+                    selected work
                   </h2>
                 </div>
 
@@ -1536,7 +1352,6 @@ export function Portfolio() {
                     <button
                       type="button"
                       onClick={() => {
-                        audioTelemetry.playClick();
                         setEvaluationTab("projects");
                       }}
                       className={`px-3 py-1 rounded-[1px] transition-all cursor-pointer ${
@@ -1545,12 +1360,11 @@ export function Portfolio() {
                           : "text-on-surface-variant hover:text-white"
                       }`}
                     >
-                      SYSTEM ARCHITECTURES
+                      PROJECTS
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        audioTelemetry.playClick();
                         setEvaluationTab("code");
                       }}
                       className={`px-3 py-1 rounded-[1px] transition-all flex items-center gap-1.5 cursor-pointer ${
@@ -1560,7 +1374,7 @@ export function Portfolio() {
                       }`}
                     >
                       <Code2 size={12} />
-                      CODE TELEMETRY
+                      IMPLEMENTATION NOTES
                     </button>
                   </div>
 
@@ -1572,7 +1386,6 @@ export function Portfolio() {
                           key={cat}
                           type="button"
                           onClick={() => {
-                            audioTelemetry.playClick();
                             setProjectFilter(cat);
                           }}
                           className={`px-2 py-1 rounded-[2px] uppercase transition-all cursor-pointer ${
@@ -1589,6 +1402,12 @@ export function Portfolio() {
                 </div>
               </div>
 
+              <p className="max-w-3xl text-sm leading-relaxed text-on-surface-variant">
+                A small set of projects that show how I approach data, model behavior, and
+                deployment—from retrieval and recommendation systems to multi-agent fine-tuning.
+                Each card highlights the engineering path and the evidence behind the result.
+              </p>
+
               {evaluationTab === "projects" ? (
                 <div className="flex flex-col gap-6">
                   {filteredProjects.map((p) => (
@@ -1596,7 +1415,7 @@ export function Portfolio() {
                   ))}
                 </div>
               ) : (
-                /* CODE TELEMETRY VIEWER */
+                /* IMPLEMENTATION NOTES VIEWER */
                 <div className="hud-panel p-5 rounded-[3px] border border-[#212c3d] bg-[#090d14]/90 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1c2535] pb-3">
                     <div className="flex flex-wrap items-center gap-2">
@@ -1604,7 +1423,6 @@ export function Portfolio() {
                         <button
                           key={snippet.id}
                           onClick={() => {
-                            audioTelemetry.playClick();
                             setActiveSnippetId(snippet.id);
                           }}
                           className={`px-3 py-1.5 rounded-[2px] font-mono text-xs border transition-all cursor-pointer ${
@@ -1641,13 +1459,13 @@ export function Portfolio() {
               )}
             </section>
 
-            {/* SECTION 04: LEARNING_REPOS */}
+            {/* SECTION 04: TECHNICAL NOTES */}
             <section className="relative py-4 flex flex-col gap-6" id="learning-repos">
               <div className="flex items-center justify-between pb-2 border-b border-[#1c2432]">
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[04]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    learning_repos
+                    technical notes
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1656,7 +1474,7 @@ export function Portfolio() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {LEARNING_REPOS.map((repo) => (
+                {TECHNICAL_NOTES.map((repo) => (
                   <div
                     key={repo.title}
                     className="hud-panel cyber-card-interactive p-5 rounded-[3px] flex flex-col justify-between gap-4 border border-[#202c3e] bg-[#090d14]/90 hover:border-cyan-spec/50 group cursor-pointer"
@@ -1709,7 +1527,7 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[05]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    capabilities
+                    skills
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1744,7 +1562,7 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[06]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    external_validation
+                    open-source contribution
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1781,7 +1599,7 @@ export function Portfolio() {
                 <div className="flex items-center gap-2">
                   <span className="font-code-mono-sm text-primary font-bold text-[14px]">[07]</span>
                   <h2 className="font-headline-md text-xl font-semibold text-white tracking-wider uppercase">
-                    limitations
+                    growth areas
                   </h2>
                 </div>
                 <span className="font-label-telemetry text-on-surface-variant text-[11px]">
@@ -1815,9 +1633,7 @@ export function Portfolio() {
                   {formStatus === "success" ? (
                     <div className="flex flex-col items-center justify-center p-8 text-center gap-3 bg-[#0a0f16] rounded border border-tertiary/40">
                       <CheckCircle2 size={36} className="text-tertiary" />
-                      <h4 className="text-white font-bold text-base">
-                        INFERENCE PING DISPATCHED // 200 OK
-                      </h4>
+                      <h4 className="text-white font-bold text-base">MESSAGE SENT // 200 OK</h4>
                       <p className="text-on-surface-variant font-mono text-xs max-w-sm">
                         Payload successfully delivered to Sourabh Kumar. Expected response SLA &lt;
                         24h.
@@ -1874,12 +1690,12 @@ export function Portfolio() {
                         {formStatus === "sending" ? (
                           <>
                             <span className="w-2 h-2 rounded-full bg-black animate-ping" />
-                            <span>DISPATCHING PAYLOAD...</span>
+                            <span>SENDING MESSAGE...</span>
                           </>
                         ) : (
                           <>
                             <Send size={15} />
-                            <span>DISPATCH INFERENCE PING</span>
+                            <span>SEND MESSAGE</span>
                           </>
                         )}
                       </button>
@@ -1936,7 +1752,7 @@ export function Portfolio() {
         {/* FOOTER TELEMETRY STATUS */}
         <footer className="w-full bg-[#080b0f]/90 border-t border-[#1d2737] py-4 px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 font-label-telemetry text-[11px] text-on-surface-variant">
           <div className="flex items-center gap-3">
-            <span>MODEL SPECIFICATION // IMMUTABLE RUNTIME</span>
+            <span>AI/ML PORTFOLIO // SOURABH KUMAR</span>
             <span className="text-outline-variant">·</span>
             <span className="text-primary font-bold">SOURABH KUMAR</span>
           </div>
@@ -1947,7 +1763,6 @@ export function Portfolio() {
             <button
               type="button"
               onClick={() => {
-                audioTelemetry.playClick();
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className="text-cyan-spec hover:underline cursor-pointer"

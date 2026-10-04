@@ -6,7 +6,6 @@ import {
   Code2,
   Copy,
   ExternalLink,
-  FileText,
   Github,
   GraduationCap,
   Layers,
@@ -35,66 +34,62 @@ interface CommandPaletteProps {
   onSelectSection?: (id: string) => void;
   toggleScanlines?: () => void;
   scanlinesEnabled?: boolean;
-  onOpenTerminal?: () => void;
-  onOpenSpecModal?: () => void;
-  onToggleAudio?: () => void;
-  audioEnabled?: boolean;
 }
 
 const SECTION_ITEMS = [
   {
     id: "overview",
-    label: "[00] MODEL_OVERVIEW",
+    label: "[00] OVERVIEW",
     icon: Terminal,
-    desc: "Hero, attention density matrix, live telemetry",
+    desc: "Introduction, featured projects, and interactive AI visual",
   },
   {
     id: "model-details",
-    label: "[01] MODEL_DETAILS",
+    label: "[01] ABOUT_ME",
     icon: Layers,
-    desc: "Architecture abstract & parameter schema",
+    desc: "Background, focus areas, and engineering trajectory",
   },
   {
     id: "training-data",
-    label: "[02] TRAINING_DATA",
+    label: "[02] EDUCATION",
     icon: GraduationCap,
-    desc: "University of Delhi degree track & certification corpus",
+    desc: "University of Delhi and selected certifications",
   },
   {
     id: "evaluation",
-    label: "[03] EVALUATION",
+    label: "[03] SELECTED_WORK",
     icon: Briefcase,
     desc: "RasoSynthTune, Raso Medical Chatbot, Movie Recommendation System",
   },
   {
     id: "learning-repos",
-    label: "[04] LEARNING_REPOS",
+    label: "[04] TECHNICAL_NOTES",
     icon: BookOpen,
-    desc: "Public research notebooks: LangChain, LangGraph, NumPy-Basic, FastAPI, PyTorch",
+    desc: "Selected learning repositories and implementation notes",
   },
   {
     id: "capabilities",
-    label: "[05] CAPABILITIES",
+    label: "[05] SKILLS",
     icon: Code2,
     desc: "Skill matrix (PyTorch, LangGraph, LoRA/PEFT)",
   },
   {
     id: "external-validation",
-    label: "[06] EXTERNAL_VALIDATION",
+    label: "[06] OPEN_SOURCE",
     icon: Sparkles,
     desc: "Merged upstream PR #48 to SwarmLLM",
   },
   {
     id: "limitations",
-    label: "[07] LIMITATIONS",
+    label: "[07] GROWTH_AREAS",
     icon: BookOpen,
     desc: "Zero-ego calibration and growth areas",
   },
   {
     id: "maintainer",
-    label: "[08] INFERENCE_PING",
+    label: "[08] CONTACT",
     icon: Mail,
-    desc: "Inference ping dispatch console & endpoints",
+    desc: "Contact form and professional links",
   },
 ];
 
@@ -104,10 +99,6 @@ export function CommandPalette({
   onSelectSection,
   toggleScanlines,
   scanlinesEnabled = true,
-  onOpenTerminal,
-  onOpenSpecModal,
-  onToggleAudio,
-  audioEnabled,
 }: CommandPaletteProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -154,7 +145,7 @@ export function CommandPalette({
       </div>
       <CommandInput placeholder="Search sections, repositories, or type command..." />
       <CommandList className="max-h-[380px] overflow-y-auto font-mono text-xs bg-[#090d14]">
-        <CommandEmpty>No matching telemetry nodes found.</CommandEmpty>
+        <CommandEmpty>No matching sections found.</CommandEmpty>
 
         <CommandGroup heading="SECTIONS">
           {SECTION_ITEMS.map((item) => {
@@ -179,7 +170,7 @@ export function CommandPalette({
 
         <CommandSeparator />
 
-        <CommandGroup heading="TELEMETRY ACTIONS">
+        <CommandGroup heading="QUICK ACTIONS">
           <CommandItem
             onSelect={() => {
               handleJump("maintainer");
@@ -237,55 +228,6 @@ export function CommandPalette({
             </div>
             <ExternalLink size={12} className="text-on-surface-variant" />
           </CommandItem>
-
-          {onOpenTerminal && (
-            <CommandItem
-              onSelect={() => {
-                onOpenChange(false);
-                onOpenTerminal();
-              }}
-              className="flex items-center justify-between py-2.5 px-3 cursor-pointer hover:bg-primary/10"
-            >
-              <div className="flex items-center gap-2.5">
-                <Terminal size={14} className="text-primary" />
-                <span>Launch Interactive Shell Console</span>
-              </div>
-              <span className="text-[10px] text-primary">~ or `</span>
-            </CommandItem>
-          )}
-
-          {onOpenSpecModal && (
-            <CommandItem
-              onSelect={() => {
-                onOpenChange(false);
-                onOpenSpecModal();
-              }}
-              className="flex items-center justify-between py-2.5 px-3 cursor-pointer hover:bg-primary/10"
-            >
-              <div className="flex items-center gap-2.5">
-                <FileText size={14} className="text-cyan-spec" />
-                <span>Inspect Curriculum Vitae Spec (PDF/Print)</span>
-              </div>
-              <span className="text-[10px] text-cyan-spec">PDF</span>
-            </CommandItem>
-          )}
-
-          {onToggleAudio && (
-            <CommandItem
-              onSelect={() => {
-                onToggleAudio();
-              }}
-              className="flex items-center justify-between py-2.5 px-3 cursor-pointer hover:bg-primary/10"
-            >
-              <div className="flex items-center gap-2.5">
-                <Sparkles size={14} className="text-tertiary" />
-                <span>Toggle Procedural Audio Telemetry</span>
-              </div>
-              <span className="text-[10px] text-tertiary">
-                {audioEnabled ? "AUDIO ON" : "MUTED"}
-              </span>
-            </CommandItem>
-          )}
 
           {toggleScanlines && (
             <CommandItem
