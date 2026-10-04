@@ -304,18 +304,21 @@ function TiltProjectCard({ project, index }: { project: Project; index: number }
       </div>
 
       <div className="project-card-meta relative z-10">
-        <span>EVALUATION // {String(index).padStart(2, "0")}</span>
-        <span>{project.category.toUpperCase()} SYSTEM</span>
+        <div className="project-card-system-label">
+          <span>SYSTEM {String(index).padStart(2, "0")}</span>
+          <span>{project.category.toUpperCase()} / PORTFOLIO EVIDENCE</span>
+        </div>
+        <div className="project-card-actions">
+          <span>{project.tag}</span>
+          <a href={project.links[0]?.href} target="_blank" rel="noopener noreferrer">
+            CODEBASE ↗
+          </a>
+        </div>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
         <h3 className="font-headline-lg text-white font-bold text-xl group-hover:text-primary transition-colors duration-200">
           {project.title}
         </h3>
-        <span
-          className={`px-2.5 py-1 rounded-[2px] font-mono text-[11px] border ${project.tagColor} transition-transform duration-200 group-hover:scale-105`}
-        >
-          {project.tag}
-        </span>
       </div>
       <div className="font-code-mono-sm text-[12px] text-cyan-spec relative z-10">
         {project.stack}
@@ -1205,6 +1208,37 @@ export function Portfolio() {
                   </div>
                 </div>
               </div>
+
+              <div className="profile-milestone-grid">
+                {[
+                  [
+                    "MILESTONE 01",
+                    "FIRST-PRINCIPLES FOUNDATIONS",
+                    "NumPy tensor routines, matrix operations, and autograd concepts.",
+                  ],
+                  [
+                    "MILESTONE 02",
+                    "AGENT ORCHESTRATION",
+                    "LangGraph workflows with routing, memory, and human review gates.",
+                  ],
+                  [
+                    "MILESTONE 03",
+                    "EFFICIENT POST-TRAINING",
+                    "4-bit QLoRA and PEFT experiments across open-weight language models.",
+                  ],
+                  [
+                    "MILESTONE 04",
+                    "UPSTREAM SYSTEMS",
+                    "Merged SwarmLLM PR #48 for visibility and node-tag controls.",
+                  ],
+                ].map(([label, title, description]) => (
+                  <article key={label} className="profile-milestone-card">
+                    <span>{label}</span>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </article>
+                ))}
+              </div>
             </section>
 
             {/* SECTION 02: TRAINING RECORD */}
@@ -1323,8 +1357,6 @@ export function Portfolio() {
                   ))}
                 </div>
               </div>
-
-              <p className="max-w-3xl text-sm leading-relaxed text-on-surface-variant"></p>
 
               <div className="flex flex-col gap-6">
                 {filteredProjects.map((p, index) => (

@@ -292,10 +292,40 @@ pre,
   font: 700 0.58rem/1 var(--font-mono);
   letter-spacing: 0.14em;
 }
-.project-card-meta span:last-child {
+.project-card-system-label,
+.project-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.project-card-system-label span:first-child {
+  color: var(--card-accent);
+  font-weight: 800;
+}
+.project-card-system-label span:last-child {
   color: #9fa6b4;
   font-weight: 500;
   letter-spacing: 0.08em;
+}
+.project-card-actions span,
+.project-card-actions a {
+  padding: 0.24rem 0.42rem;
+  border: 1px solid color-mix(in srgb, var(--card-accent) 32%, #1e2736);
+  border-radius: 0.2rem;
+  color: var(--card-accent);
+  font: 700 0.55rem/1 var(--font-mono);
+  letter-spacing: 0.07em;
+}
+.project-card-actions a {
+  border-color: transparent;
+  color: #e2e2e6;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.project-card-actions a:hover {
+  border-color: color-mix(in srgb, var(--card-accent) 42%, transparent);
+  color: var(--card-accent);
 }
 .project-pipeline {
   display: grid;
@@ -350,6 +380,62 @@ pre,
   color: var(--card-accent);
   font: 700 0.8rem/1 var(--font-mono);
   opacity: 0.8;
+}
+.profile-milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.profile-milestone-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 9.5rem;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+  border-radius: 0.5rem;
+  background: linear-gradient(145deg, rgba(14, 19, 26, 0.96), rgba(7, 10, 15, 0.96));
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.profile-milestone-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, var(--primary), var(--color-cyan-spec), var(--color-tertiary));
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.profile-milestone-card:hover {
+  border-color: rgba(236, 194, 70, 0.52);
+  box-shadow:
+    0 16px 30px -14px rgba(0, 0, 0, 0.9),
+    0 0 18px rgba(236, 194, 70, 0.08);
+  transform: translateY(-4px);
+}
+.profile-milestone-card:hover::before {
+  transform: scaleX(1);
+}
+.profile-milestone-card > span {
+  color: var(--primary);
+  font: 700 0.58rem/1 var(--font-mono);
+  letter-spacing: 0.1em;
+}
+.profile-milestone-card h3 {
+  color: #e2e2e6;
+  font: 700 0.8rem/1.25 var(--font-sans);
+}
+.profile-milestone-card p {
+  color: #9fa6b4;
+  font: 0.75rem/1.45 var(--font-sans);
 }
 .attention-labeled-grid {
   display: grid;
@@ -580,5 +666,15 @@ pre,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+@media (max-width: 1024px) {
+  .profile-milestone-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .profile-milestone-grid {
+    grid-template-columns: 1fr;
   }
 }
