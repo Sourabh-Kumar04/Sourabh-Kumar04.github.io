@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { CommandPalette } from "./CommandPalette";
-import { Interactive3DCore } from "./Interactive3DCore";
 import { Toaster } from "./ui/sonner";
 import {
   FileText,
@@ -161,6 +160,8 @@ const TECHNICAL_NOTES: LearningRepo[] = [
     topics: ["Tracing", "Debugging", "Evals", "Prompt Monitoring"],
   },
 ];
+
+const SKILL_NODES = ["LLM", "RAG", "AGENTS", "PEFT", "PYTORCH", "EVALS"];
 
 // Production code snippets for the Evaluation section
 const CODE_SNIPPETS = [
@@ -457,7 +458,6 @@ export function Portfolio() {
   const [evaluationTab, setEvaluationTab] = useState<"projects" | "code">("projects");
   const [activeSnippetId, setActiveSnippetId] = useState("peft-lora");
   const [copiedSnippet, setCopiedSnippet] = useState(false);
-  const [heroWidgetTab, setHeroWidgetTab] = useState<"3d-core" | "attention">("3d-core");
 
   // Scroll depth tracking
   const [scrollPercent, setScrollPercent] = useState(0);
@@ -477,6 +477,14 @@ export function Portfolio() {
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
   const [hoveredCell, setHoveredCell] = useState<{ index: number; weight: number } | null>(null);
   const [isRecomputing, setIsRecomputing] = useState(false);
+  const [attentionPulseIndex, setAttentionPulseIndex] = useState(0);
+
+  useEffect(() => {
+    const pulseTimer = window.setInterval(() => {
+      setAttentionPulseIndex((previous) => (previous + 1) % INITIAL_WEIGHTS.length);
+    }, 900);
+    return () => window.clearInterval(pulseTimer);
+  }, []);
 
   // Payload console dispatch state
   const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -632,7 +640,7 @@ export function Portfolio() {
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
               </span>
               <span className="font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
-                SK-04
+                MODEL CARD
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -740,7 +748,7 @@ export function Portfolio() {
             <div className="flex items-center gap-2 bg-[#121822] px-2.5 lg:px-3 py-1 rounded-[2px] border border-[#232e40]">
               <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
               <span className="text-primary font-bold text-[10px] lg:text-[11px] tracking-wider uppercase">
-                SK-04
+                MODEL CARD
               </span>
             </div>
 
@@ -821,10 +829,6 @@ export function Portfolio() {
                   </span>
                   <span className="text-outline-variant">/</span>
                   <span>
-                    NODE: <code className="text-primary font-code-mono-sm">SK-04</code>
-                  </span>
-                  <span className="text-outline-variant">/</span>
-                  <span>
                     STATUS: <code className="text-tertiary font-code-mono-sm">ONLINE</code>
                   </span>
                 </div>
@@ -848,6 +852,10 @@ export function Portfolio() {
                           OPEN TO AI/ML INTERNSHIPS
                         </span>
                       </div>
+                      <p className="model-greeting" aria-label="Hello, I am Sourabh Kumar">
+                        <span>HELLO, I’M</span>
+                        <span className="text-primary"> SOURABH KUMAR</span>
+                      </p>
                       <h1 className="font-display-hero text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 tracking-[-0.03em] leading-[1.08] pt-1">
                         Sourabh Kumar
                       </h1>
@@ -879,7 +887,7 @@ export function Portfolio() {
                         title="Open LinkedIn profile and resume details"
                       >
                         <FileText size={13} />
-                        <span>VIEW RESUME / CV SPEC ↗</span>
+                        <span>VIEW LINKEDIN PROFILE ↗</span>
                       </a>
                       <a
                         className="bg-[#151c27] border border-[#2e3b4f] text-on-surface hover:text-primary hover:border-primary/50 px-4 py-2 rounded-[2px] transition-all flex items-center gap-1.5 cursor-pointer"
@@ -906,126 +914,106 @@ export function Portfolio() {
                     </div>
                   </div>
 
-                  {/* Interactive 3D Neural Core & Attention Matrix Switcher Panel */}
+                  {/* Model-card attention demo */}
                   <div className="lg:col-span-4 bg-[#0a0d14]/90 border border-[#222c3d] p-4 rounded-[3px] flex flex-col gap-3">
                     <div className="flex items-center justify-between border-b border-[#1b2331] pb-1.5">
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setHeroWidgetTab("3d-core");
-                          }}
-                          className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
-                            heroWidgetTab === "3d-core"
-                              ? "bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)]"
-                              : "text-on-surface-variant hover:text-white"
-                          }`}
-                        >
-                          3D TENSOR CORE
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setHeroWidgetTab("attention");
-                          }}
-                          className={`px-2 py-0.5 rounded-[2px] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold transition-all cursor-pointer ${
-                            heroWidgetTab === "attention"
-                              ? "bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)]"
-                              : "text-on-surface-variant hover:text-white"
-                          }`}
-                        >
-                          ATTENTION MATRIX
-                        </button>
-                      </div>
-
-                      {heroWidgetTab === "attention" && (
-                        <button
-                          type="button"
-                          onClick={recomputeAttention}
-                          disabled={isRecomputing}
-                          className="font-code-mono-sm text-[10px] text-tertiary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                          title="Simulate new attention forward pass"
-                        >
-                          <RefreshCw
-                            size={11}
-                            className={isRecomputing ? "animate-spin text-primary" : ""}
-                          />
-                          <span>{isRecomputing ? "..." : "RERUN DEMO"}</span>
-                        </button>
-                      )}
+                      <span className="px-2 py-0.5 rounded-[2px] bg-primary text-black shadow-[0_0_10px_rgba(236,194,70,0.4)] font-label-telemetry text-[9.5px] tracking-wider uppercase font-bold">
+                        MODEL ATTENTION MAP
+                      </span>
+                      <button
+                        type="button"
+                        onClick={recomputeAttention}
+                        disabled={isRecomputing}
+                        className="font-code-mono-sm text-[10px] text-tertiary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                        title="Regenerate the simulated attention demo"
+                      >
+                        <RefreshCw
+                          size={11}
+                          className={isRecomputing ? "animate-spin text-primary" : ""}
+                        />
+                        <span>{isRecomputing ? "..." : "RERUN DEMO"}</span>
+                      </button>
                     </div>
 
-                    {heroWidgetTab === "3d-core" ? (
-                      <Interactive3DCore />
-                    ) : (
-                      <>
-                        {/* Interactive 48-Cell Grid */}
-                        <p className="text-[10px] text-on-surface-variant leading-relaxed">
-                          Demo visualization: simulated attention weights for an 8-head transformer.
-                          This is not a live model output.
-                        </p>
-                        <div
-                          role="grid"
-                          aria-label="Simulated transformer attention weight demo"
-                          className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
-                        >
-                          {attentionWeights.map((w, idx) => {
-                            const isHovered = hoveredCell?.index === idx;
-                            const opacity = Math.max(0.12, w);
-                            return (
-                              <div
-                                key={idx}
-                                role="gridcell"
-                                tabIndex={0}
-                                aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
-                                onFocus={() => {
-                                  setHoveredCell({ index: idx, weight: w });
-                                }}
-                                onBlur={() => setHoveredCell(null)}
-                                onMouseEnter={() => {
-                                  setHoveredCell({ index: idx, weight: w });
-                                }}
-                                onMouseLeave={() => setHoveredCell(null)}
-                                onClick={() => {
-                                  setAttentionWeights((prev) => {
-                                    const next = [...prev];
-                                    next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
-                                    return next;
-                                  });
-                                }}
-                                className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${
-                                  isRecomputing ? "cell-recomputing" : ""
-                                }`}
-                                style={{
-                                  backgroundColor:
-                                    idx === 47 ? "var(--tertiary)" : "var(--primary)",
-                                  opacity: isHovered ? 1 : opacity,
-                                  transform: isHovered ? "scale(1.35)" : "scale(1)",
-                                  zIndex: isHovered ? 10 : 1,
-                                  boxShadow: isHovered ? "0 0 10px rgba(236,194,70,0.8)" : "none",
-                                  animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
-                                }}
-                              />
-                            );
-                          })}
-                        </div>
+                    <>
+                      {/* Interactive 48-cell demo grid */}
+                      <p className="text-[10px] text-on-surface-variant leading-relaxed">
+                        Demo visualization: simulated attention weights for an 8-head transformer.
+                        This is not a live model output.
+                      </p>
+                      <div
+                        role="grid"
+                        aria-label="Simulated transformer attention weight demo"
+                        className="grid grid-cols-8 gap-1 p-2 bg-[#06080c] rounded-[2px] border border-[#1b2331]"
+                      >
+                        {attentionWeights.map((w, idx) => {
+                          const isHovered = hoveredCell?.index === idx;
+                          const opacity = Math.max(0.12, w);
+                          return (
+                            <div
+                              key={idx}
+                              role="gridcell"
+                              tabIndex={0}
+                              aria-label={`Attention Head ${(idx % 8) + 1}, Weight ${w.toFixed(3)}`}
+                              onFocus={() => {
+                                setHoveredCell({ index: idx, weight: w });
+                              }}
+                              onBlur={() => setHoveredCell(null)}
+                              onMouseEnter={() => {
+                                setHoveredCell({ index: idx, weight: w });
+                              }}
+                              onMouseLeave={() => setHoveredCell(null)}
+                              onClick={() => {
+                                setAttentionWeights((prev) => {
+                                  const next = [...prev];
+                                  next[idx] = Number((Math.random() * 0.9 + 0.1).toFixed(2));
+                                  return next;
+                                });
+                              }}
+                              className={`aspect-square rounded-[1px] transition-all duration-200 cursor-crosshair relative focus:outline-none focus:ring-1 focus:ring-primary ${`${isRecomputing ? "cell-recomputing" : ""} ${
+                                attentionPulseIndex === idx ? "attention-active" : ""
+                              }`}`}
+                              style={{
+                                backgroundColor: idx === 47 ? "var(--tertiary)" : "var(--primary)",
+                                opacity: isHovered ? 1 : opacity,
+                                transform: isHovered ? "scale(1.35)" : "scale(1)",
+                                zIndex: isHovered ? 10 : 1,
+                                animationDelay: isRecomputing ? `${(idx % 8) * 35}ms` : undefined,
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
 
-                        {/* Dynamic Readout */}
-                        <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px] tabular-nums">
-                          {hoveredCell ? (
-                            <span className="text-primary font-bold">
-                              [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] ·
-                              α_ij: {hoveredCell.weight.toFixed(3)} (Softmax)
-                            </span>
-                          ) : (
-                            <span className="text-cyan-spec font-medium">
-                              Σ_j α_ij = 1.000 · ROW-STOCHASTIC
-                            </span>
-                          )}
-                          <span className="text-tertiary">CONVERGED</span>
+                      {/* Dynamic readout */}
+                      <div className="flex items-center justify-between font-label-telemetry text-[10px] text-on-surface-variant min-h-[16px] tabular-nums">
+                        {hoveredCell ? (
+                          <span className="text-primary font-bold">
+                            [q_{Math.floor(hoveredCell.index / 8)}, k_{hoveredCell.index % 8}] ·
+                            α_ij: {hoveredCell.weight.toFixed(3)} (Softmax)
+                          </span>
+                        ) : (
+                          <span className="text-cyan-spec font-medium">
+                            Σ_j α_ij = 1.000 · ROW-STOCHASTIC
+                          </span>
+                        )}
+                        <span className="text-tertiary">CONVERGED</span>
+                      </div>
+                      <div
+                        className="depth-meter"
+                        aria-label={`Page depth ${scrollPercent.toFixed(0)} percent`}
+                      >
+                        <div className="flex items-center justify-between font-label-telemetry text-[9px] text-on-surface-variant">
+                          <span>MODEL CARD DEPTH</span>
+                          <span className="text-primary tabular-nums">
+                            {scrollPercent.toFixed(0)}%
+                          </span>
                         </div>
-                      </>
-                    )}
+                        <div className="depth-track">
+                          <div className="depth-fill" style={{ width: `${scrollPercent}%` }} />
+                        </div>
+                      </div>
+                    </>
                   </div>
                 </div>
 
@@ -1204,7 +1192,7 @@ export function Portfolio() {
                     <div className="flex flex-col divide-y divide-[#18212e] font-code-mono-sm text-[11.5px]">
                       <div className="py-2 flex justify-between items-center">
                         <span className="text-on-surface-variant">OPERATOR_ID</span>
-                        <span className="text-white font-bold">Sourabh Kumar (SK-04)</span>
+                        <span className="text-white font-bold">Sourabh Kumar</span>
                       </div>
                       <div className="py-2 flex justify-between items-center">
                         <span className="text-on-surface-variant">ACADEMIC_TRACK</span>
@@ -1552,6 +1540,27 @@ export function Portfolio() {
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
                   <span className="text-on-surface-variant w-32 shrink-0">data_stores:</span>
                   <span className="text-white">Redis · PostgreSQL · Qdrant</span>
+                </div>
+                <div className="skills-orbit-wrap" aria-label="Animated AI skills map">
+                  <div className="skills-orbit">
+                    <div className="skills-orbit-ring skills-orbit-ring-outer" />
+                    <div className="skills-orbit-ring skills-orbit-ring-inner" />
+                    <div className="skills-orbit-core">
+                      MODEL
+                      <br />
+                      STACK
+                    </div>
+                    {SKILL_NODES.map((skill, index) => (
+                      <span
+                        key={skill}
+                        className="skill-orbit-node"
+                        style={{ "--skill-angle": `${index * 60}deg` } as React.CSSProperties}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="skills-orbit-caption">CAPABILITY MAP // ANIMATED OVERVIEW</span>
                 </div>
               </div>
             </section>

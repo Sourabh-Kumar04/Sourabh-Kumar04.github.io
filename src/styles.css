@@ -165,6 +165,132 @@ pre,
 .cell-recomputing {
   animation: attention-ripple 0.4s ease-out;
 }
+.attention-active {
+  animation: attention-focus 0.9s ease-in-out;
+}
+.model-greeting {
+  display: block;
+  color: var(--on-surface-variant, #9fa6b4);
+  font: 700 0.65rem/1.2 var(--font-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  animation: greeting-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.model-greeting .text-primary {
+  animation: greeting-name 1s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.depth-meter {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 0.15rem;
+}
+.depth-track {
+  position: relative;
+  height: 0.3rem;
+  overflow: hidden;
+  border: 1px solid rgba(21, 217, 199, 0.25);
+  background: #06080c;
+}
+.depth-fill {
+  position: relative;
+  height: 100%;
+  min-width: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--color-cyan-spec));
+  box-shadow: 0 0 10px rgba(21, 217, 199, 0.55);
+  transition: width 0.45s ease;
+}
+.depth-fill::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.5rem;
+  height: 100%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  animation: depth-scan 1.8s ease-in-out infinite;
+}
+.skills-orbit-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 14rem;
+  padding: 1rem 0 0.25rem;
+  border-top: 1px solid #1b2331;
+}
+.skills-orbit {
+  position: relative;
+  width: 12rem;
+  height: 12rem;
+  display: grid;
+  place-items: center;
+}
+.skills-orbit-ring {
+  position: absolute;
+  inset: 1.1rem;
+  border: 1px solid rgba(21, 217, 199, 0.35);
+  border-radius: 50%;
+  animation: orbit-spin 16s linear infinite;
+}
+.skills-orbit-ring::after {
+  position: absolute;
+  top: -0.25rem;
+  left: 50%;
+  width: 0.45rem;
+  height: 0.45rem;
+  content: "";
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+.skills-orbit-ring-inner {
+  inset: 2.55rem;
+  border-color: rgba(236, 194, 70, 0.35);
+  animation-duration: 10s;
+  animation-direction: reverse;
+}
+.skills-orbit-ring-inner::after {
+  background: var(--color-cyan-spec);
+  box-shadow: 0 0 10px var(--color-cyan-spec);
+}
+.skills-orbit-core {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 4.6rem;
+  height: 4.6rem;
+  border: 1px solid rgba(236, 194, 70, 0.6);
+  border-radius: 50%;
+  color: var(--primary);
+  background: #0b1018;
+  box-shadow:
+    0 0 22px rgba(236, 194, 70, 0.16),
+    inset 0 0 18px rgba(21, 217, 199, 0.08);
+  font: 700 0.58rem/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-align: center;
+  animation: core-breathe 2.8s ease-in-out infinite;
+}
+.skill-orbit-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.6rem;
+  margin: -0.5rem -1.8rem;
+  transform: rotate(var(--skill-angle)) translateY(-5.4rem) rotate(calc(var(--skill-angle) * -1));
+  color: var(--on-surface-variant);
+  font: 700 0.52rem/1 var(--font-mono);
+  letter-spacing: 0.04em;
+  text-align: center;
+  animation: skill-pulse 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--skill-angle) * 0.01s);
+}
+.skills-orbit-caption {
+  max-width: 7rem;
+  color: var(--on-surface-variant);
+  font: 0.56rem/1.5 var(--font-mono);
+  letter-spacing: 0.08em;
+}
 
 @keyframes telemetry-scan {
   0% {
@@ -190,6 +316,65 @@ pre,
     filter: brightness(2.4);
     transform: scale(1.18);
     box-shadow: 0 0 12px rgba(236, 194, 70, 0.9);
+  }
+}
+@keyframes attention-focus {
+  0%,
+  100% {
+    filter: brightness(1);
+    box-shadow: 0 0 0 rgba(236, 194, 70, 0);
+  }
+  50% {
+    filter: brightness(2.2);
+    box-shadow: 0 0 12px rgba(236, 194, 70, 0.9);
+  }
+}
+@keyframes greeting-reveal {
+  from {
+    opacity: 0;
+    letter-spacing: 0.35em;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.16em;
+    transform: translateY(0);
+  }
+}
+@keyframes greeting-name {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes depth-scan {
+  from {
+    transform: translateX(-2rem);
+  }
+  to {
+    transform: translateX(2rem);
+  }
+}
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes core-breathe {
+  50% {
+    box-shadow:
+      0 0 30px rgba(236, 194, 70, 0.3),
+      inset 0 0 22px rgba(21, 217, 199, 0.14);
+  }
+}
+@keyframes skill-pulse {
+  50% {
+    color: var(--primary);
+    text-shadow: 0 0 8px rgba(236, 194, 70, 0.55);
   }
 }
 @keyframes card-entrance {
