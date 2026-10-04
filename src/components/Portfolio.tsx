@@ -474,16 +474,16 @@ export function Portfolio() {
 
       {/* FIXED LEFT NAVIGATION CONSOLE */}
       <aside
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] ${sidebarCollapsed ? "lg:w-16 sidebar-collapsed" : "lg:w-64"} w-64 bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto transition-[width,transform] duration-300 ease-in-out ${
+        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] ${sidebarCollapsed ? "lg:w-16 sidebar-collapsed" : "lg:w-64"} w-64 max-w-[calc(100vw-1rem)] bg-[#080b0f]/95 backdrop-blur-2xl z-50 flex flex-col justify-between py-3 border-r border-[#1e2736] overflow-y-auto transition-[width,transform] duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="flex flex-col gap-3">
           {/* Node Header */}
-          <div className="px-4 py-2 flex items-center justify-between border-b border-[#1b2330]">
-            <div className="flex items-center gap-2">
+          <div className="px-4 py-2 flex items-center justify-between gap-2 border-b border-[#1b2330]">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <FolderGit2 size={17} className="text-primary shrink-0" />
-              <span className="sidebar-collapsible font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
+              <span className="sidebar-collapsible min-w-0 truncate font-code-mono-sm text-[12px] text-primary tracking-widest uppercase font-bold">
                 MODEL CARD INDEX
               </span>
             </div>

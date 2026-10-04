@@ -139,7 +139,7 @@ export function CommandPalette({
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <div className="border-b border-[#222c3d] px-3 py-2 flex items-center justify-between text-xs font-mono text-on-surface-variant bg-[#0c1017]">
         <span className="flex items-center gap-1.5 text-primary font-bold">
-          <Terminal size={13} /> SK-04 // SYSTEM KERNEL PALETTE
+          <Terminal size={13} /> Sourabh-Kumar04
         </span>
         <span className="text-[10px] text-primary/60">ESC TO CLOSE</span>
       </div>

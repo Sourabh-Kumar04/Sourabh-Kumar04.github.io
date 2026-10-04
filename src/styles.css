@@ -229,6 +229,12 @@ body {
 .sidebar-collapsed .sidebar-collapsible {
   display: none;
 }
+.sidebar-collapsible {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .sidebar-collapsed nav a {
   justify-content: center;
   padding-inline: 0.45rem;

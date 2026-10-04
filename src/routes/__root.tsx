@@ -77,7 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS" },
+      { title: "Sourabh-Kumar04" },
       {
         name: "description",
         content:
@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Sourabh Kumar" },
       {
         property: "og:title",
-        content: "SK-04 // SOURABH KUMAR — APPLIED LLM & AI SYSTEMS",
+        content: "Sourabh-Kumar04",
       },
       {
         property: "og:description",
