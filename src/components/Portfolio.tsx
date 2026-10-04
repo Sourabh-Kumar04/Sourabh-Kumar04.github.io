@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Toaster } from "./ui/sonner";
 import {
@@ -49,7 +49,6 @@ interface Project {
   title: string;
   category: "agents" | "peft" | "ml";
   tag: string;
-  tagColor: string;
   stack: string;
   description: string;
   outcome: string;
@@ -63,7 +62,6 @@ const PROJECTS: Project[] = [
     title: "RasoSynthTune",
     category: "peft",
     tag: "PROTOTYPE",
-    tagColor: "bg-tertiary/10 text-tertiary border-tertiary/30",
     stack: "FastAPI · LangGraph · LoRA/PEFT · Docker · Redis · PostgreSQL · Qdrant",
     description:
       "End-to-end multi-agent pipeline discovering, filtering, and synthesizing domain datasets with automated quality gating (>85% score retention) and human-in-the-loop review. Implements 4-bit QLoRA fine-tuning across all 7 linear projections on Llama-3-8B and Mistral-7B, yielding 41.9M trainable params (0.519%) on single consumer GPUs.",
@@ -78,7 +76,6 @@ const PROJECTS: Project[] = [
     title: "Raso Medical Chatbot",
     category: "agents",
     tag: "REDEPLOYING",
-    tagColor: "bg-primary/10 text-primary border-primary/30",
     stack: "RAG · Llama 2 · Flask",
     description:
       "A retrieval-augmented chatbot answering health questions from a full medical encyclopedia rather than relying on memory. Currently being redeployed after a configuration change.",
@@ -96,7 +93,6 @@ const PROJECTS: Project[] = [
     title: "Movie Recommendation System",
     category: "ml",
     tag: "STABLE",
-    tagColor: "bg-tertiary/10 text-tertiary border-tertiary/30",
     stack: "Python · pandas · scikit-learn",
     description:
       "A content-based recommender scoring films by genre, rating and similarity to suggest what to watch next.",
@@ -373,7 +369,6 @@ export function Portfolio() {
   const [activeSection, setActiveSection] = useState("model-overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [projectFilter, setProjectFilter] = useState<"all" | "agents" | "peft" | "ml">("all");
 
   // Interactive attention matrix state
   const [attentionWeights, setAttentionWeights] = useState<number[]>(INITIAL_WEIGHTS);
@@ -464,12 +459,6 @@ export function Portfolio() {
     });
     setTimeout(() => setIsRecomputing(false), 450);
   };
-
-  // Filtered projects list
-  const filteredProjects = useMemo(() => {
-    if (projectFilter === "all") return PROJECTS;
-    return PROJECTS.filter((p) => p.category === projectFilter);
-  }, [projectFilter]);
 
   return (
     <div className="relative min-h-screen bg-[#07090c] text-on-surface antialiased overflow-x-hidden selection:bg-primary selection:text-black font-display-hero">
@@ -1189,27 +1178,10 @@ export function Portfolio() {
                     evaluation set: 3 production-grade systems
                   </h2>
                 </div>
-
-                <div className="project-filter flex items-center gap-1 font-code-mono-sm text-[11px]">
-                  {(["all", "peft", "agents", "ml"] as const).map((cat) => (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => setProjectFilter(cat)}
-                      className={`px-2 py-1 rounded-[2px] uppercase transition-all cursor-pointer ${
-                        projectFilter === cat
-                          ? "bg-primary text-black font-bold"
-                          : "bg-[#101620] text-on-surface-variant hover:text-white border border-[#212c3d]"
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               <div className="flex flex-col gap-6">
-                {filteredProjects.map((p, index) => (
+                {PROJECTS.map((p, index) => (
                   <TiltProjectCard key={p.title} project={p} index={index + 1} />
                 ))}
               </div>
