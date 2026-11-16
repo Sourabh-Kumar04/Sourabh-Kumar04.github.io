@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Portfolio } from "../components/Portfolio";
+import { AILabPortfolio } from "../components/AILabPortfolio";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -54,5 +54,5 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: Portfolio,
+  component: AILabPortfolio,
 });
